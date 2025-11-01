@@ -1,0 +1,68 @@
+{
+  "name": "particle-morph",
+  "version": "1.0.0",
+  "description": "A highly configurable React component for creating stunning 3D particle morph effects with Three.js",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "react",
+    "three",
+    "threejs",
+    "particles",
+    "3d",
+    "webgl",
+    "animation",
+    "morph",
+    "react-three-fiber",
+    "r3f"
+  ],
+  "author": {
+    "name": "Mohammad Alipour",
+    "url": "https://github.com/mmdalipour"
+  },
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "three": "^0.160.0",
+    "@react-three/fiber": "^8.0.0",
+    "@react-three/drei": "^9.0.0",
+    "@react-three/postprocessing": "^2.0.0",
+    "gsap": "^3.0.0",
+    "postprocessing": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/three": "^0.160.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mmdalipour/particle-morph"
+  },
+  "bugs": {
+    "url": "https://github.com/mmdalipour/particle-morph/issues"
+  },
+  "homepage": "https://github.com/mmdalipour/particle-morph#readme"
+}
+

@@ -1,0 +1,35 @@
+# Source files (only ship compiled dist/)
+*.ts
+*.tsx
+!*.d.ts
+
+# Config files
+tsconfig.json
+tsup.config.ts
+
+# System files
+.DS_Store
+node_modules
+
+# Documentation that shouldn't be published
+BUILD_INSTRUCTIONS.md
+CHANGELOG.md
+CONTRIBUTING.md
+
+# Lock files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Tests
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__/
+test/
+tests/
+
+# Development
+.git
+.github

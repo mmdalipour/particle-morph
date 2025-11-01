@@ -1,7 +1,8 @@
 {
-  "name": "portfolio-web-app",
-  "version": "0.1.0",
+  "name": "particle-morph-demo",
+  "version": "1.0.0",
   "private": true,
+  "description": "Demo application for particle-morph package",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

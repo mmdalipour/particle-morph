@@ -1,204 +1,301 @@
-# 3D Particle Morphing Portfolio
+# particle-morph
 
-Advanced 3D particle effect for portfolio landing page where a 3D object is rendered as particles that disperse on scroll and gather back when scrolling to the original position.
+A highly configurable React component library for creating stunning 3D particle morph effects with Three.js and React Three Fiber. Now refactored as a publishable npm package!
 
-## Features
+## 🎯 Features
 
-- **Scroll-Driven Animation**: Particles disperse as you scroll down (over 2 viewport heights) and gather back when scrolling up
-- **Custom 3D Models**: Support for any GLTF/GLB 3D model - easily swap models via configuration
-- **Smooth Animations**: GSAP-powered smooth scrolling with no jitter
-- **Desktop-Only**: Optimized for desktop with mobile fallback for performance
-- **Ethereal Glow**: Cyan/blue particles with bloom post-processing effect
-- **~5000 Particles**: High-quality particle system with optimal performance
+- 🎨 **Model Particlization** - Convert any 3D GLTF model into interactive particles
+- 🎭 **Smooth Morphing** - Seamless transitions between particle states
+- 🖱️ **Interactive Rotation** - Drag to rotate with inertia and smooth damping
+- 📜 **Scroll Integration** - Animate particles based on scroll progress
+- 💫 **Bloom Effects** - Beautiful glow effects with postprocessing
+- ⚙️ **Highly Configurable** - Customize colors, sizes, behaviors, and more
+- 🎯 **TypeScript** - Full TypeScript support with comprehensive types
+- 📦 **Modular Architecture** - Use individual components and hooks as needed
+- 🚀 **NPM Ready** - Structured for easy npm publishing
 
-## Tech Stack
+## 📦 Project Structure
 
-- **Next.js 14** (App Router)
-- **React Three Fiber** (@react-three/fiber)
-- **Three.js** (3D rendering)
-- **GSAP** (Smooth animations)
-- **TypeScript**
-- **Custom GLSL Shaders** (Particle morphing)
-- **@react-three/postprocessing** (Bloom effects)
-
-## Getting Started
-
-### Development
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) to see the particle effect.
-
-### Production Build
-
-```bash
-npm run build
-npm start
-```
-
-## Project Structure
+This project is now structured as an npm package:
 
 ```
 portfolio-web-app/
-├── app/                    # Next.js app directory
-│   ├── layout.tsx         # Root layout
-│   ├── page.tsx           # Landing page
-│   └── globals.css        # Global styles
-├── components/            # React components
-│   ├── ParticleHero.tsx  # Main component (viewport detection)
-│   ├── ParticleScene.tsx # Canvas + post-processing setup
-│   ├── ParticleSystem.tsx # Core particle rendering
-│   └── HeroFallback.tsx  # Mobile fallback
-├── hooks/                 # Custom React hooks
-│   ├── useScrollProgress.ts    # Scroll tracking
-│   └── useParticleGeometry.ts  # Model loading
-├── utils/                 # Utility functions
-│   └── modelToParticles.ts    # Model conversion logic
-├── shaders/               # GLSL shaders
-│   ├── particleMorph.vert.glsl # Vertex shader
-│   └── particleMorph.frag.glsl # Fragment shader
-├── config/                # Configuration
-│   └── particle-scene.config.ts # Scene settings
-├── types/                 # TypeScript types
-│   ├── particle.types.ts
-│   └── glsl.d.ts
-└── public/
-    └── models/            # 3D models
-        └── low-poly-circle.gltf
+├── src/                          # Package source (publishable)
+│   ├── components/               # React components
+│   │   ├── ParticleMorph.tsx    # Main component
+│   │   ├── ParticleModel.tsx    # Model particlization component
+│   │   └── index.ts
+│   ├── hooks/                    # Custom hooks
+│   │   ├── useInteractiveRotation.ts
+│   │   ├── useScrollProgress.ts
+│   │   ├── useParticleGeometry.ts
+│   │   └── index.ts
+│   ├── utils/                    # Utilities
+│   │   └── modelToParticles.ts
+│   ├── shaders/                  # GLSL shaders
+│   │   ├── particleMorph.vert.glsl
+│   │   └── particleMorph.frag.glsl
+│   ├── types/                    # TypeScript types
+│   │   └── index.ts
+│   ├── index.ts                  # Main entry point
+│   ├── package.json              # Package metadata
+│   ├── tsconfig.json            # Package TypeScript config
+│   ├── .npmignore               # NPM ignore rules
+│   └── README.md                # Package documentation
+├── app/                          # Demo app (Next.js)
+│   ├── page.tsx                 # Demo page using the package
+│   ├── layout.tsx
+│   └── globals.css
+├── components/                   # Old components (deprecated)
+├── hooks/                        # Old hooks (deprecated)
+├── config/                       # Old config (deprecated)
+├── public/
+│   └── models/                  # 3D model files
+│       └── sphere.glb
+├── package.json                 # Root project config
+├── tsconfig.json               # Root TypeScript config
+└── next.config.js              # Next.js config
 ```
 
-## How to Swap 3D Models
+## 🚀 Quick Start
 
-The system is designed to work with any 3D model. To use your own model (like a 3D face):
-
-### Step 1: Prepare Your 3D Model
-
-1. Export your model as `.glb` or `.gltf` format from Blender, Maya, or other 3D software
-2. Recommended vertex count: 2,000-10,000 vertices (for good particle distribution)
-3. Ensure the model is:
-   - Centered at origin (0, 0, 0)
-   - Appropriately scaled (fits comfortably in viewport)
-   - Front-facing if it's a face/character
-
-### Step 2: Add Model to Project
-
-Place your model file in `public/models/`:
+### Using in the Demo App
 
 ```bash
-public/models/
-├── low-poly-circle.gltf  # Default model
-└── your-model.glb        # Your new model
-```
+# Install dependencies
+npm install
 
-### Step 3: Update Configuration
-
-Edit `config/particle-scene.config.ts`:
-
-```typescript
-export const particleSceneConfig: ParticleConfig = {
-  modelPath: '/models/your-model.glb',  // Update this path
-  targetParticleCount: 5000,
-  dispersalRadius: 20,  // Adjust if needed
-  // ... other settings
-};
-```
-
-### Step 4: Adjust Settings (Optional)
-
-Depending on your model's size and complexity, you may want to tune:
-
-- **dispersalRadius**: How far particles spread (try 15-25)
-- **particleSize**: Size of individual particles (try 2-4)
-- **camera.position**: Camera distance (default: [0, 0, 10])
-- **targetParticleCount**: Number of particles (5000 recommended)
-
-### Step 5: Refresh
-
-```bash
+# Run development server
 npm run dev
 ```
 
-Your new model will now be rendered as particles!
+Open [http://localhost:3000](http://localhost:3000) to see the demo.
 
-## Configuration Options
+### Using as a Package
 
-All settings are in `config/particle-scene.config.ts`:
+The package is located in the `src/` directory and can be used locally:
 
-```typescript
-{
-  modelPath: '/models/low-poly-circle.gltf',  // Path to 3D model
-  targetParticleCount: 5000,                  // Number of particles
-  dispersalRadius: 20,                        // Spread distance
-  colors: {
-    primary: '#00ffff',                       // Cyan glow
-    secondary: '#0088ff'                      // Blue glow
-  },
-  particleSize: 3,                           // Particle size
-  bloom: {
-    strength: 1.5,                           // Bloom intensity
-    radius: 0.8,                             // Bloom radius
-    threshold: 0.1                           // Bloom threshold
-  },
-  camera: {
-    position: [0, 0, 10],                    // Camera position
-    fov: 75                                  // Field of view
-  }
+```tsx
+import { ParticleMorph } from '../src';
+
+function App() {
+  return (
+    <ParticleMorph
+      modelPath="/models/sphere.glb"
+      targetParticleCount={5000}
+      colors={{
+        primary: '#00ffff',
+        secondary: '#0088ff'
+      }}
+    />
+  );
 }
 ```
 
-## How It Works
+## 📚 API Documentation
 
-1. **Model Loading**: GLTF model is loaded and vertices are extracted
-2. **Particle Generation**: Each vertex becomes a particle; additional particles are sampled on mesh surfaces if needed
-3. **Scattered Positions**: For each particle, a "scattered" position is calculated radially from the model center
-4. **Shader Morphing**: Custom GLSL shaders interpolate between "formed" and "scattered" positions based on scroll progress
-5. **Scroll Tracking**: GSAP smooths scroll position and converts it to 0-1 progress value
-6. **Post-Processing**: Bloom effect adds ethereal glow to particles
+### ParticleMorph Component
 
-## Performance
+The main component for creating particle morph effects.
 
-- **Target**: 60 FPS on mid-range GPUs (GTX 1660 or equivalent)
-- **Desktop-Only**: Automatically shows fallback on mobile/tablet (< 1024px width)
-- **~5000 Particles**: Balanced for visual quality and performance
-- **GPU Acceleration**: All particle calculations run on GPU via shaders
+```tsx
+<ParticleMorph
+  modelPath="/models/skull.glb"        // Required: Path to GLTF model
+  targetParticleCount={5000}           // Optional: Number of particles
+  dispersalRadius={40}                 // Optional: Particle spread distance
+  colors={{                            // Optional: Colors
+    primary: '#00ffff',
+    secondary: '#0088ff'
+  }}
+  particleSize={3}                     // Optional: Particle size
+  bloom={{                             // Optional: Bloom effect
+    enabled: true,
+    strength: 1.5,
+    radius: 0.8,
+    threshold: 0.1
+  }}
+  camera={{                            // Optional: Camera config
+    position: [0, 0, 10],
+    fov: 75
+  }}
+  rotation={{                          // Optional: Rotation config
+    enabled: true,
+    dampingFactor: 0.08,
+    autoRotateSpeed: 0.001
+  }}
+  scroll={{                            // Optional: Scroll config
+    enabled: true,
+    triggerHeight: 2
+  }}
+  background="#000000"                 // Optional: Background color
+/>
+```
 
-## Browser Support
+### ParticleModel Component
 
-- Chrome/Edge (Chromium) - ✅ Fully supported
-- Firefox - ✅ Fully supported
-- Safari - ✅ Fully supported (WebGL required)
-- Mobile - ⚠️ Shows static fallback (by design)
+Lower-level component for custom scenes.
 
-## Troubleshooting
+```tsx
+import { Canvas } from '@react-three/fiber';
+import { ParticleModel } from '../src';
 
-### Particles don't appear
-- Check browser console for errors
-- Verify model path is correct in config
-- Ensure model file exists in `public/models/`
+function CustomScene() {
+  return (
+    <Canvas>
+      <ParticleModel
+        modelPath="/models/sphere.glb"
+        targetParticleCount={5000}
+        colors={{ primary: '#00ffff', secondary: '#0088ff' }}
+        scrollProgress={0.5}
+      />
+    </Canvas>
+  );
+}
+```
 
-### Model looks wrong
-- Check model is centered at origin in 3D software
-- Adjust camera position in config
-- Verify model scale (should fit in viewport)
+### Hooks
 
-### Performance issues
-- Reduce `targetParticleCount` (try 3000)
-- Lower bloom strength
-- Check if GPU acceleration is enabled in browser
+#### useParticleGeometry
 
-### Model too spread out / too tight
-- Adjust `dispersalRadius` in config
-- Smaller values = tighter grouping
-- Larger values = more dramatic spread
+```tsx
+import { useParticleGeometry } from '../src';
 
-## Credits
+const { geometry, isLoading, error } = useParticleGeometry(
+  '/models/sphere.glb',
+  5000,  // particle count
+  40     // dispersal radius
+);
+```
 
-Built with [Three.js](https://threejs.org/), [React Three Fiber](https://docs.pmnd.rs/react-three-fiber), and [GSAP](https://greensock.com/gsap/).
+#### useInteractiveRotation
 
-Inspired by advanced particle effects like those on [ompfinex.com](https://www.ompfinex.com).
+```tsx
+import { useInteractiveRotation } from '../src';
 
-## License
+const { rotation, onPointerDown, onPointerMove, onPointerUp, isDragging } = 
+  useInteractiveRotation(0.08, 0.001);
+```
+
+#### useScrollProgress
+
+```tsx
+import { useScrollProgress } from '../src';
+
+const progress = useScrollProgress(2); // 2 viewport heights
+```
+
+## 🎨 Customization Examples
+
+### Custom Colors
+
+```tsx
+<ParticleMorph
+  modelPath="/models/sphere.glb"
+  colors={{
+    primary: '#ff00ff',
+    secondary: '#00ff00'
+  }}
+/>
+```
+
+### Disable Scroll Animation
+
+```tsx
+<ParticleMorph
+  modelPath="/models/sphere.glb"
+  scroll={{ enabled: false }}
+  rotation={{ autoRotateSpeed: 0.005 }}
+/>
+```
+
+### Custom Camera
+
+```tsx
+<ParticleMorph
+  modelPath="/models/sphere.glb"
+  camera={{
+    position: [5, 5, 15],
+    fov: 60
+  }}
+/>
+```
+
+## 📦 Publishing to NPM
+
+To publish this package to npm:
+
+1. Navigate to the `src/` directory:
+```bash
+cd src
+```
+
+2. Build the package (you'll need to set up a build process):
+```bash
+# Add build script to src/package.json
+npm run build
+```
+
+3. Update version in `src/package.json`
+
+4. Publish:
+```bash
+npm publish --access public
+```
+
+5. Install in other projects:
+```bash
+npm install particle-morph
+```
+
+## 🔧 How It Works
+
+1. **Model Loading**: GLTF model loaded and vertices extracted
+2. **Particle Generation**: Each vertex becomes a particle
+3. **Scattered Positions**: Radial dispersion calculated for each particle
+4. **Shader Morphing**: GLSL shaders interpolate between states
+5. **Scroll Tracking**: GSAP smooths scroll to 0-1 progress
+6. **Post-Processing**: Bloom effect adds glow
+
+## 🎯 Use Cases
+
+- Portfolio landing pages
+- Product showcases
+- Interactive art installations
+- Data visualizations
+- Creative web experiences
+
+## 🔨 Tech Stack
+
+- **React 18** + **TypeScript**
+- **Three.js** - 3D rendering
+- **React Three Fiber** - React renderer for Three.js
+- **@react-three/drei** - Three.js helpers
+- **@react-three/postprocessing** - Post-processing effects
+- **GSAP** - Smooth animations
+- **Custom GLSL Shaders** - Particle morphing
+
+## 🌐 Browser Support
+
+- Chrome/Edge ✅
+- Firefox ✅
+- Safari ✅
+- WebGL required
+
+## ⚡ Performance
+
+- Optimized for 60 FPS
+- GPU-accelerated particle rendering
+- ~5000 particles with high performance
+- Desktop optimized (with mobile detection)
+
+## 📝 License
 
 MIT
+
+## 👤 Author
+
+Mohammad
+
+## 🤝 Contributing
+
+Contributions welcome! This is structured for easy npm publishing and modular usage.
