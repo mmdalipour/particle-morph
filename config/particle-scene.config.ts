@@ -1,9 +1,9 @@
 import { ParticleConfig } from '@/types/particle.types';
 
 export const particleSceneConfig: ParticleConfig = {
-  modelPath: '/models/sphere.glb',
+  modelPath: '/models/male_skull.glb',
   targetParticleCount: 5000,
-  dispersalRadius: 20,
+  dispersalRadius: 40,
   colors: {
     primary: '#00ffff',
     secondary: '#0088ff'

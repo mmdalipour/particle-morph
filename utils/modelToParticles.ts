@@ -17,9 +17,17 @@ export function convertModelToParticles(
   const modelCenter = new THREE.Vector3();
   const boundingBox = new THREE.Box3();
 
-  // Calculate bounding box to find model center
+  // Calculate bounding box to find model center and size
   boundingBox.setFromObject(model);
   boundingBox.getCenter(modelCenter);
+  
+  const modelSize = boundingBox.getSize(new THREE.Vector3());
+  const maxDimension = Math.max(modelSize.x, modelSize.y, modelSize.z);
+  const targetSize = 5; // Target size for the model
+  const scale = targetSize / maxDimension;
+  
+  // Store original center for transformations
+  const originalCenter = modelCenter.clone();
 
   // Traverse model and extract vertex positions
   model.traverse((child) => {
@@ -45,6 +53,9 @@ export function convertModelToParticles(
 
           // Apply world transformation
           child.localToWorld(vertex);
+          
+          // Center and scale the model
+          vertex.sub(originalCenter).multiplyScalar(scale);
 
           positions.push(vertex.x, vertex.y, vertex.z);
         }
@@ -134,6 +145,9 @@ export function convertModelToParticles(
 
           // Apply world transformation
           mesh.localToWorld(point);
+          
+          // Center and scale the point
+          point.sub(originalCenter).multiplyScalar(scale);
 
           finalPositions.push(point.x, point.y, point.z);
         }
@@ -157,8 +171,8 @@ export function convertModelToParticles(
       finalPositions[i + 2]
     );
 
-    // Calculate direction from model center
-    const direction = formedPos.clone().sub(modelCenter).normalize();
+    // Calculate direction from origin (model is now centered at 0,0,0)
+    const direction = formedPos.clone().normalize();
 
     // Generate random factor (0.8 to 1.2)
     const randomFactor = 0.8 + Math.random() * 0.4;
@@ -189,6 +203,25 @@ export function convertModelToParticles(
     'randomFactor',
     new THREE.Float32BufferAttribute(randomFactors, 1)
   );
+
+  // Step 5: Compute bounding sphere that encompasses both formed and scattered positions
+  // This is critical to prevent culling when particles are dispersed or rotated
+  const allPositions: number[] = [...finalPositions, ...scatteredPositions];
+  const tempBox = new THREE.Box3();
+  
+  for (let i = 0; i < allPositions.length; i += 3) {
+    tempBox.expandByPoint(
+      new THREE.Vector3(allPositions[i], allPositions[i + 1], allPositions[i + 2])
+    );
+  }
+  
+  const center = new THREE.Vector3();
+  tempBox.getCenter(center);
+  const maxRadius = tempBox.getSize(new THREE.Vector3()).length() / 2;
+  
+  // Set a generous bounding sphere
+  geometry.boundingSphere = new THREE.Sphere(center, maxRadius * 1.2);
+  geometry.boundingBox = tempBox;
 
   return geometry;
 }

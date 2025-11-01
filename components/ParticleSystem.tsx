@@ -106,6 +106,7 @@ export default function ParticleSystem({
         ref={pointsRef} 
         geometry={geometry} 
         material={material}
+        frustumCulled={false}
       />
       {/* Invisible sphere to capture pointer events */}
       <mesh
@@ -113,8 +114,9 @@ export default function ParticleSystem({
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerLeave={onPointerUp}
+        frustumCulled={false}
       >
-        <sphereGeometry args={[5, 32, 32]} />
+        <sphereGeometry args={[10, 32, 32]} />
         <meshBasicMaterial transparent opacity={0} />
       </mesh>
     </group>
