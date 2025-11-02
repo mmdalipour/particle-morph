@@ -99,7 +99,7 @@ export function ParticleMorph({
           gl={{ 
             antialias: true,
             powerPreference: 'high-performance',
-            alpha: false,
+            alpha: true,
             stencil: false,
             depth: true
           }}
