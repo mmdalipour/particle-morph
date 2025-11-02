@@ -61,6 +61,7 @@ export function ParticleModel({
     dispersalRadius
   );
 
+  // Memoize color conversions to reduce object allocations
   const primaryColor = useMemo(() => {
     const color = new THREE.Color(colors.primary);
     return new THREE.Vector3(color.r, color.g, color.b);
@@ -74,31 +75,51 @@ export function ParticleModel({
   const material = useMemo(() => {
     if (!geometry) return null;
 
-    return new THREE.ShaderMaterial({
+    const mat = new THREE.ShaderMaterial({
       vertexShader,
       fragmentShader,
       uniforms: {
         uProgress: { value: 0 },
         uPixelRatio: { value: Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, 2) },
         uSize: { value: particleSize },
-        uColorPrimary: { value: primaryColor },
-        uColorSecondary: { value: secondaryColor }
+        uColorPrimary: { value: primaryColor.clone() },
+        uColorSecondary: { value: secondaryColor.clone() }
       },
       transparent: true,
       depthWrite: false,
-      blending: THREE.AdditiveBlending
+      blending: THREE.AdditiveBlending,
     });
+    
+    return mat;
   }, [geometry, primaryColor, secondaryColor, particleSize]);
 
+  // Update color uniforms when they change (without recreating material)
   useEffect(() => {
-    if (material && material.uniforms.uProgress) {
-      material.uniforms.uProgress.value = scrollProgress;
+    if (material) {
+      material.uniforms.uColorPrimary.value.copy(primaryColor);
+      material.uniforms.uColorSecondary.value.copy(secondaryColor);
     }
-  }, [scrollProgress, material]);
+  }, [material, primaryColor, secondaryColor]);
+
+  // Clean up material on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (material) {
+        material.dispose();
+      }
+    };
+  }, [material]);
+
+  // Update progress uniform directly without re-creating material
+  const progressRef = useRef(scrollProgress);
+  progressRef.current = scrollProgress;
 
   useFrame(() => {
-    if (pointsRef.current && material) {
-      material.uniforms.uProgress.value = scrollProgress;
+    if (material) {
+      // Only update if changed
+      if (material.uniforms.uProgress.value !== progressRef.current) {
+        material.uniforms.uProgress.value = progressRef.current;
+      }
     }
     if (groupRef.current && rotationEnabled) {
       groupRef.current.rotation.copy(rotation);

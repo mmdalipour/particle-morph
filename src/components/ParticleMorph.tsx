@@ -96,7 +96,15 @@ export function ParticleMorph({
             position: cameraPosition,
             fov: cameraFov
           }}
-          gl={{ antialias: true }}
+          gl={{ 
+            antialias: true,
+            powerPreference: 'high-performance',
+            alpha: false,
+            stencil: false,
+            depth: true
+          }}
+          dpr={[1, 2]}
+          performance={{ min: 0.5 }}
           style={{ 
             background, 
             width: '100%', 

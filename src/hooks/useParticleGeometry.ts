@@ -24,6 +24,8 @@ export function useParticleGeometry(
   const gltf = useGLTF(modelPath);
 
   useEffect(() => {
+    let currentGeometry: THREE.BufferGeometry | null = null;
+
     try {
       setIsLoading(true);
       setError(null);
@@ -32,19 +34,26 @@ export function useParticleGeometry(
         throw new Error('Failed to load GLTF model');
       }
 
-      const particleGeometry = convertModelToParticles(
+      currentGeometry = convertModelToParticles(
         gltf.scene,
         targetCount,
         dispersalRadius
       );
 
-      setGeometry(particleGeometry);
+      setGeometry(currentGeometry);
       setIsLoading(false);
     } catch (err) {
       console.error('Error creating particle geometry:', err);
       setError(err instanceof Error ? err : new Error('Unknown error'));
       setIsLoading(false);
     }
+
+    // Cleanup function to dispose geometry and prevent memory leaks
+    return () => {
+      if (currentGeometry) {
+        currentGeometry.dispose();
+      }
+    };
   }, [gltf, targetCount, dispersalRadius]);
 
   return { geometry, isLoading, error };

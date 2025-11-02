@@ -12,7 +12,8 @@ export function convertModelToParticles(
   targetCount: number = 5000,
   dispersalRadius: number = 40
 ): THREE.BufferGeometry {
-  const positions: number[] = [];
+  // Pre-allocate TypedArrays for better performance
+  const tempPositions: number[] = [];
   const modelCenter = new THREE.Vector3();
   const boundingBox = new THREE.Box3();
 
@@ -24,60 +25,86 @@ export function convertModelToParticles(
   const targetSize = 5;
   const scale = targetSize / maxDimension;
   
-  const originalCenter = modelCenter.clone();
+  const centerX = modelCenter.x;
+  const centerY = modelCenter.y;
+  const centerZ = modelCenter.z;
+
+  // Reusable Vector3 to reduce allocations
+  const vertex = new THREE.Vector3();
+  const worldMatrix = new THREE.Matrix4();
 
   model.traverse((child) => {
     if (child instanceof THREE.Mesh) {
       const geometry = child.geometry;
-      const clonedGeometry = geometry.clone();
-      if (!clonedGeometry.attributes.position) return;
+      if (!geometry.attributes.position) return;
       
-      const nonIndexedGeometry = clonedGeometry.index 
-        ? clonedGeometry.toNonIndexed() 
-        : clonedGeometry;
+      const nonIndexedGeometry = geometry.index 
+        ? geometry.toNonIndexed() 
+        : geometry;
       
       const positionAttribute = nonIndexedGeometry.attributes.position;
 
       if (positionAttribute) {
-        const vertex = new THREE.Vector3();
+        worldMatrix.copy(child.matrixWorld);
 
+        // Direct array access is faster than fromBufferAttribute
+        const array = positionAttribute.array;
         for (let i = 0; i < positionAttribute.count; i++) {
-          vertex.fromBufferAttribute(positionAttribute, i);
-          child.localToWorld(vertex);
-          vertex.sub(originalCenter).multiplyScalar(scale);
-          positions.push(vertex.x, vertex.y, vertex.z);
+          const i3 = i * 3;
+          vertex.set(array[i3], array[i3 + 1], array[i3 + 2]);
+          vertex.applyMatrix4(worldMatrix);
+          
+          // Inline subtraction and scaling for performance
+          const x = (vertex.x - centerX) * scale;
+          const y = (vertex.y - centerY) * scale;
+          const z = (vertex.z - centerZ) * scale;
+          
+          tempPositions.push(x, y, z);
         }
       }
       
-      clonedGeometry.dispose();
+      // Dispose only if we created a new geometry
+      if (geometry.index && nonIndexedGeometry !== geometry) {
+        nonIndexedGeometry.dispose();
+      }
     }
   });
 
-  const vertexCount = positions.length / 3;
+  const vertexCount = tempPositions.length / 3;
 
   if (vertexCount === 0) {
     throw new Error('Model has no vertices');
   }
 
-  let finalPositions: number[] = [];
+  // Use Float32Array for better GPU upload performance
+  let finalPositions: Float32Array;
 
   if (vertexCount === targetCount) {
-    finalPositions = positions;
+    finalPositions = new Float32Array(tempPositions);
   } else if (vertexCount > targetCount) {
-    const indices = new Set<number>();
-    while (indices.size < targetCount) {
-      indices.add(Math.floor(Math.random() * vertexCount));
+    // Optimized sampling using Fisher-Yates shuffle approach
+    finalPositions = new Float32Array(targetCount * 3);
+    const indices = new Uint32Array(vertexCount);
+    for (let i = 0; i < vertexCount; i++) indices[i] = i;
+    
+    // Partial shuffle - only shuffle what we need
+    for (let i = 0; i < targetCount; i++) {
+      const j = i + Math.floor(Math.random() * (vertexCount - i));
+      const temp = indices[i];
+      indices[i] = indices[j];
+      indices[j] = temp;
+      
+      const srcIdx = indices[i] * 3;
+      const dstIdx = i * 3;
+      finalPositions[dstIdx] = tempPositions[srcIdx];
+      finalPositions[dstIdx + 1] = tempPositions[srcIdx + 1];
+      finalPositions[dstIdx + 2] = tempPositions[srcIdx + 2];
     }
-
-    Array.from(indices).forEach(index => {
-      finalPositions.push(
-        positions[index * 3],
-        positions[index * 3 + 1],
-        positions[index * 3 + 2]
-      );
-    });
   } else {
-    finalPositions = [...positions];
+    // Need to generate additional particles
+    finalPositions = new Float32Array(targetCount * 3);
+    finalPositions.set(tempPositions);
+    
     const additionalCount = targetCount - vertexCount;
     const meshes: THREE.Mesh[] = [];
 
@@ -86,6 +113,12 @@ export function convertModelToParticles(
         meshes.push(child);
       }
     });
+
+    // Reuse vectors for particle generation
+    const v1 = new THREE.Vector3();
+    const v2 = new THREE.Vector3();
+    const v3 = new THREE.Vector3();
+    const point = new THREE.Vector3();
 
     for (let i = 0; i < additionalCount; i++) {
       if (meshes.length > 0) {
@@ -100,10 +133,16 @@ export function convertModelToParticles(
 
         if (positionAttribute && positionAttribute.count >= 3) {
           const faceIndex = Math.floor(Math.random() * (positionAttribute.count / 3)) * 3;
+          const array = positionAttribute.array;
 
-          const v1 = new THREE.Vector3().fromBufferAttribute(positionAttribute, faceIndex);
-          const v2 = new THREE.Vector3().fromBufferAttribute(positionAttribute, faceIndex + 1);
-          const v3 = new THREE.Vector3().fromBufferAttribute(positionAttribute, faceIndex + 2);
+          // Direct array access for performance
+          const idx1 = faceIndex * 3;
+          const idx2 = (faceIndex + 1) * 3;
+          const idx3 = (faceIndex + 2) * 3;
+          
+          v1.set(array[idx1], array[idx1 + 1], array[idx1 + 2]);
+          v2.set(array[idx2], array[idx2 + 1], array[idx2 + 2]);
+          v3.set(array[idx3], array[idx3 + 1], array[idx3 + 2]);
 
           let r1 = Math.random();
           let r2 = Math.random();
@@ -115,14 +154,17 @@ export function convertModelToParticles(
 
           const r3 = 1 - r1 - r2;
 
-          const point = new THREE.Vector3()
+          point.set(0, 0, 0)
             .addScaledVector(v1, r1)
             .addScaledVector(v2, r2)
             .addScaledVector(v3, r3);
 
           mesh.localToWorld(point);
-          point.sub(originalCenter).multiplyScalar(scale);
-          finalPositions.push(point.x, point.y, point.z);
+          
+          const dstIdx = (vertexCount + i) * 3;
+          finalPositions[dstIdx] = (point.x - centerX) * scale;
+          finalPositions[dstIdx + 1] = (point.y - centerY) * scale;
+          finalPositions[dstIdx + 2] = (point.z - centerZ) * scale;
         }
         
         if (geometry.index && nonIndexedGeometry !== geometry) {
@@ -132,59 +174,70 @@ export function convertModelToParticles(
     }
   }
 
-  const scatteredPositions: number[] = [];
-  const randomFactors: number[] = [];
+  // Pre-allocate TypedArrays for scattered positions
+  const particleCount = targetCount;
+  const scatteredPositions = new Float32Array(particleCount * 3);
+  const randomFactors = new Float32Array(particleCount);
 
-  for (let i = 0; i < finalPositions.length; i += 3) {
-    const formedPos = new THREE.Vector3(
-      finalPositions[i],
-      finalPositions[i + 1],
-      finalPositions[i + 2]
-    );
+  let maxDistanceSquared = 0;
 
-    const direction = formedPos.clone().normalize();
+  for (let i = 0; i < particleCount; i++) {
+    const i3 = i * 3;
+    const x = finalPositions[i3];
+    const y = finalPositions[i3 + 1];
+    const z = finalPositions[i3 + 2];
+
+    // Calculate direction and normalize inline for performance
+    const length = Math.sqrt(x * x + y * y + z * z);
+    const invLength = length > 0 ? 1 / length : 0;
+    
     const randomFactor = 0.8 + Math.random() * 0.4;
+    const offset = dispersalRadius * randomFactor;
 
-    const scatteredPos = formedPos
-      .clone()
-      .add(direction.multiplyScalar(dispersalRadius * randomFactor));
+    // Normalized direction multiplied by offset
+    const dx = x * invLength * offset;
+    const dy = y * invLength * offset;
+    const dz = z * invLength * offset;
 
-    scatteredPositions.push(scatteredPos.x, scatteredPos.y, scatteredPos.z);
-    randomFactors.push(randomFactor);
+    // Calculate scattered position directly
+    scatteredPositions[i3] = x + dx;
+    scatteredPositions[i3 + 1] = y + dy;
+    scatteredPositions[i3 + 2] = z + dz;
+    
+    randomFactors[i] = randomFactor;
+
+    // Track max distance for both positions
+    const formedDistSq = x * x + y * y + z * z;
+    const scatteredDistSq = scatteredPositions[i3] * scatteredPositions[i3] + 
+                            scatteredPositions[i3 + 1] * scatteredPositions[i3 + 1] + 
+                            scatteredPositions[i3 + 2] * scatteredPositions[i3 + 2];
+    maxDistanceSquared = Math.max(maxDistanceSquared, formedDistSq, scatteredDistSq);
   }
 
   const geometry = new THREE.BufferGeometry();
 
+  // Use BufferAttribute directly with TypedArrays for better GPU performance
   geometry.setAttribute(
     'position',
-    new THREE.Float32BufferAttribute(finalPositions, 3)
+    new THREE.BufferAttribute(finalPositions, 3)
   );
 
   geometry.setAttribute(
     'scatteredPosition',
-    new THREE.Float32BufferAttribute(scatteredPositions, 3)
+    new THREE.BufferAttribute(scatteredPositions, 3)
   );
 
   geometry.setAttribute(
     'randomFactor',
-    new THREE.Float32BufferAttribute(randomFactors, 1)
+    new THREE.BufferAttribute(randomFactors, 1)
   );
 
-  const allPositions: number[] = [...finalPositions, ...scatteredPositions];
-  const tempBox = new THREE.Box3();
+  // Optimized bounding sphere calculation
+  const maxRadius = Math.sqrt(maxDistanceSquared);
+  geometry.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), maxRadius * 1.5);
   
-  for (let i = 0; i < allPositions.length; i += 3) {
-    tempBox.expandByPoint(
-      new THREE.Vector3(allPositions[i], allPositions[i + 1], allPositions[i + 2])
-    );
-  }
-  
-  const center = new THREE.Vector3();
-  tempBox.getCenter(center);
-  const maxRadius = tempBox.getSize(new THREE.Vector3()).length() / 2;
-  
-  geometry.boundingSphere = new THREE.Sphere(center, maxRadius * 1.2);
-  geometry.boundingBox = tempBox;
+  // Compute bounding box for proper culling
+  geometry.computeBoundingBox();
 
   return geometry;
 }

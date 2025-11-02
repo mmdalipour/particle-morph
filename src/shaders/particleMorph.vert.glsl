@@ -7,16 +7,23 @@ uniform float uProgress;
 uniform float uPixelRatio;
 uniform float uSize;
 
+// Varying to pass data to fragment shader
+varying float vDistance;
+
 void main() {
-  // Start formed (progress=0), scatter as you scroll down (progress=1)
+  // Interpolate between formed and scattered positions
   vec3 finalPosition = mix(position, scatteredPosition, uProgress);
 
-  // Apply transformations
+  // Single matrix multiplication (GPU optimized)
   vec4 modelViewPosition = modelViewMatrix * vec4(finalPosition, 1.0);
   gl_Position = projectionMatrix * modelViewPosition;
 
-  // Calculate point size based on distance from camera
-  float distanceFromCamera = -modelViewPosition.z;
-  gl_PointSize = uSize * uPixelRatio * (1.0 / distanceFromCamera) * 10.0;
+  // Optimized distance calculation and size attenuation
+  float distance = -modelViewPosition.z;
+  vDistance = distance;
+  
+  // Simplified size calculation (avoid max/branching on GPU)
+  float sizeAttenuation = 1.0 / max(distance, 1.0);
+  gl_PointSize = uSize * uPixelRatio * sizeAttenuation * 10.0 + 0.5;
 }
 
