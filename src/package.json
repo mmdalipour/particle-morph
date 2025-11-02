@@ -1,6 +1,6 @@
 {
   "name": "@mmdalipour/particle-morph",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A highly configurable React component for creating stunning 3D particle morph effects with Three.js",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
