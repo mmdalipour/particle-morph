@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Particle Morph Examples</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1a1a2e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            background: linear-gradient(90deg, #00ffff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #aaaaaa;
+            margin-bottom: 30px;
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .example-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .example-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(0, 255, 255, 0.5);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
+        }
+
+        .example-number {
+            font-size: 0.9rem;
+            color: #00ffff;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .example-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #ffffff;
+        }
+
+        .example-description {
+            color: #aaaaaa;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .example-features {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .example-features li {
+            font-size: 0.9rem;
+            color: #888888;
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .example-features li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #00ffff;
+        }
+
+        .docs-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 40px;
+            margin-top: 40px;
+        }
+
+        .docs-section h2 {
+            color: #00ffff;
+            margin-bottom: 20px;
+        }
+
+        .docs-section p {
+            color: #aaaaaa;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .docs-section code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #ff00ff;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #666666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Particle Morph Examples</h1>
+            <p class="subtitle">Explore different configurations and features of the particle-morph library</p>
+        </header>
+
+        <div class="examples-grid">
+            <div class="example-card" onclick="alert('To run: Copy code from 01-basic-morph/page.tsx to app/page.tsx and run npm run dev')">
+                <div class="example-number">Example 01</div>
+                <h3 class="example-title">Basic Morph</h3>
+                <p class="example-description">
+                    Simple morphing between two shapes (sphere and box) with standard settings. Perfect starting point.
+                </p>
+                <ul class="example-features">
+                    <li>Two-stage morphing</li>
+                    <li>Basic color transition</li>
+                    <li>5,000 particles</li>
+                </ul>
+            </div>
+
+            <div class="example-card" onclick="alert('To run: Copy code from 02-multi-stage/page.tsx to app/page.tsx and run npm run dev')">
+                <div class="example-number">Example 02</div>
+                <h3 class="example-title">Multi-Stage</h3>
+                <p class="example-description">
+                    Advanced morphing through 4 different geometric shapes with smooth color transitions.
+                </p>
+                <ul class="example-features">
+                    <li>Four-stage morphing</li>
+                    <li>Multiple color transitions</li>
+                    <li>8,000 particles</li>
+                </ul>
+            </div>
+
+            <div class="example-card" onclick="alert('To run: Copy code from 03-explosion-effect/page.tsx to app/page.tsx and run npm run dev')">
+                <div class="example-number">Example 03</div>
+                <h3 class="example-title">Explosion Effect</h3>
+                <p class="example-description">
+                    Demonstrates the dramatic explosion feature where particles scatter dramatically.
+                </p>
+                <ul class="example-features">
+                    <li>Explosion on second stage</li>
+                    <li>Large explosion radius (50)</li>
+                    <li>10,000 particles</li>
+                </ul>
+            </div>
+
+            <div class="example-card" onclick="alert('To run: Copy code from 04-color-transitions/page.tsx to app/page.tsx and run npm run dev')">
+                <div class="example-number">Example 04</div>
+                <h3 class="example-title">Color Transitions</h3>
+                <p class="example-description">
+                    Showcases smooth color transitions through a rainbow spectrum of colors.
+                </p>
+                <ul class="example-features">
+                    <li>Rainbow color scheme</li>
+                    <li>Four different shapes</li>
+                    <li>Strong bloom effects</li>
+                </ul>
+            </div>
+
+            <div class="example-card" onclick="alert('To run: Copy code from 05-geometric-shapes/page.tsx to app/page.tsx and run npm run dev')">
+                <div class="example-number">Example 05</div>
+                <h3 class="example-title">Geometric Shapes</h3>
+                <p class="example-description">
+                    Complete showcase of all available geometric shapes in the library.
+                </p>
+                <ul class="example-features">
+                    <li>8 different geometric shapes</li>
+                    <li>Comprehensive shape library</li>
+                    <li>7,000 particles</li>
+                </ul>
+            </div>
+
+            <div class="example-card" onclick="alert('To run: Copy code from 06-minimal/page.tsx to app/page.tsx and run npm run dev')">
+                <div class="example-number">Example 06</div>
+                <h3 class="example-title">Minimal</h3>
+                <p class="example-description">
+                    The simplest possible configuration using default settings. Perfect for quick start.
+                </p>
+                <ul class="example-features">
+                    <li>Minimal configuration</li>
+                    <li>Default values showcase</li>
+                    <li>Easy to understand</li>
+                </ul>
+            </div>
+
+            <div class="example-card" onclick="alert('To run: Copy code from 07-high-particle-count/page.tsx to app/page.tsx and run npm run dev')">
+                <div class="example-number">Example 07</div>
+                <h3 class="example-title">High Particle Count</h3>
+                <p class="example-description">
+                    Performance test with 15,000 particles to demonstrate scalability.
+                </p>
+                <ul class="example-features">
+                    <li>15,000 particles</li>
+                    <li>Performance benchmark</li>
+                    <li>Optimized settings</li>
+                </ul>
+            </div>
+
+            <div class="example-card" onclick="alert('To run: Copy code from 08-custom-animations/page.tsx to app/page.tsx and run npm run dev')">
+                <div class="example-number">Example 08</div>
+                <h3 class="example-title">Custom Animations</h3>
+                <p class="example-description">
+                    Demonstrates various particle animation configurations for energetic effects.
+                </p>
+                <ul class="example-features">
+                    <li>High damping factor (3.0)</li>
+                    <li>Fast drift speed (4.0)</li>
+                    <li>Energetic dust-like effect</li>
+                </ul>
+            </div>
+
+            <div class="example-card" onclick="alert('To run: Copy code from 09-with-custom-model/page.tsx to app/page.tsx and run npm run dev')">
+                <div class="example-number">Example 09</div>
+                <h3 class="example-title">Custom 3D Model</h3>
+                <p class="example-description">
+                    Shows how to use your own GLTF/GLB 3D models in particle morphing.
+                </p>
+                <ul class="example-features">
+                    <li>Custom 3D model loading</li>
+                    <li>Model to shape morphing</li>
+                    <li>Comprehensive guide included</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="docs-section">
+            <h2>How to Run Examples</h2>
+            <p>
+                Each example is a standalone Next.js page component. To run an example:
+            </p>
+            <p>
+                1. Copy the code from the desired example's <code>page.tsx</code> file<br>
+                2. Replace the content in <code>app/page.tsx</code> with the copied code<br>
+                3. Run <code>npm run dev</code> or <code>pnpm dev</code><br>
+                4. Open <a href="http://localhost:3000" style="color: #00ffff;">http://localhost:3000</a> in your browser
+            </p>
+            <p>
+                For more detailed documentation, see the <code>README.md</code> file in the examples directory.
+            </p>
+        </div>
+
+        <footer>
+            <p>Particle Morph Library &copy; 2024 | MIT License</p>
+        </footer>
+    </div>
+</body>
+</html>
+

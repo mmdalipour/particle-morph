@@ -44,6 +44,7 @@ export interface ShapeStage {
   shape: ShapeConfig;
   scrollStart: number; // 0 to 1
   scrollEnd: number;   // 0 to 1
+  color?: string; // Color for this stage (hex or CSS color)
   explosion?: {
     enabled: boolean;
     radius: number;
@@ -84,7 +85,6 @@ export interface ParticleMorphConfig {
     driftSpeed?: number;
     driftAmplitude?: number;
   };
-  background?: string;
   className?: string;
   style?: React.CSSProperties;
 }

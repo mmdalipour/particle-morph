@@ -127,6 +127,7 @@ export function useMultiShapeMorphGeometry(
       modelPath: s.shape.modelPath,
       start: s.scrollStart,
       end: s.scrollEnd,
+      color: s.color,
       explosion: s.explosion
     }))),
     particleCount,

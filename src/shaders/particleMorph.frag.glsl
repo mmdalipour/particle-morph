@@ -1,10 +1,9 @@
 // Uniforms
-uniform vec3 uColorPrimary;
-uniform vec3 uColorSecondary;
 uniform float uProgress;
 
 // Varying from vertex shader
 varying float vDistance;
+varying vec3 vColor;
 
 void main() {
   // Optimized circular particle with smoothstep for AA
@@ -19,14 +18,8 @@ void main() {
   float strength = 1.0 - sqrt(dist) * 2.0;
   strength = strength * strength * strength; // Faster than pow(strength, 3.0)
   
-  // Pre-compute progress factor
-  float progressFactor = uProgress * 0.5;
-  
-  // Mix colors (GPU optimized lerp)
-  vec3 mixedColor = uColorPrimary + (uColorSecondary - uColorPrimary) * progressFactor;
-  
-  // Apply glow strength
-  vec3 finalColor = mixedColor * strength;
+  // Use interpolated color from vertex shader
+  vec3 finalColor = vColor * strength;
   
   // Calculate final alpha
   float baseAlpha = 1.0 - uProgress * 0.15; // Equivalent to mix(1.0, 0.85, uProgress)

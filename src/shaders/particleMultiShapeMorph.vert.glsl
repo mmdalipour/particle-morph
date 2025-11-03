@@ -27,8 +27,15 @@ uniform float uHasAnyExplosion;
 uniform vec4 uExplosionEnabled; // x=stage0, y=stage1, z=stage2, w=stage3
 uniform vec4 uExplosionRadii;   // x=stage0, y=stage1, z=stage2, w=stage3
 
+// Stage colors
+uniform vec3 uStage0Color;
+uniform vec3 uStage1Color;
+uniform vec3 uStage2Color;
+uniform vec3 uStage3Color;
+
 // Varying to pass data to fragment shader
 varying float vDistance;
+varying vec3 vColor;
 
 // Smooth ease-in for explosion expansion (starts slow, accelerates gradually)
 float smoothExplosionExpand(float t) {
@@ -49,7 +56,7 @@ float smoothExplosionReverse(float t) {
   return smoothed / (1.0 - exp(-5.0));
 }
 
-vec3 getInterpolatedPosition() {
+vec3 getInterpolatedPosition(out vec3 interpolatedColor) {
   // Simple approach: iterate through stages and interpolate between them
   
   // Stage 0: transition to position1
@@ -57,8 +64,10 @@ vec3 getInterpolatedPosition() {
     float stageProgress = (uProgress - uStage0Range.x) / (uStage0Range.y - uStage0Range.x);
     stageProgress = clamp(stageProgress, 0.0, 1.0);
     if (uStageCount > 1.0) {
+      interpolatedColor = mix(uStage0Color, uStage1Color, stageProgress);
       return mix(position0, position1, stageProgress);
     }
+    interpolatedColor = uStage0Color;
     return position0;
   } 
   // Stage 1: transition to position2
@@ -66,8 +75,10 @@ vec3 getInterpolatedPosition() {
     float stageProgress = (uProgress - uStage1Range.x) / (uStage1Range.y - uStage1Range.x);
     stageProgress = clamp(stageProgress, 0.0, 1.0);
     if (uStageCount > 2.0) {
+      interpolatedColor = mix(uStage1Color, uStage2Color, stageProgress);
       return mix(position1, position2, stageProgress);
     }
+    interpolatedColor = uStage1Color;
     return position1;
   } 
   // Stage 2: transition to position3
@@ -75,23 +86,37 @@ vec3 getInterpolatedPosition() {
     float stageProgress = (uProgress - uStage2Range.x) / (uStage2Range.y - uStage2Range.x);
     stageProgress = clamp(stageProgress, 0.0, 1.0);
     if (uStageCount > 3.0) {
+      interpolatedColor = mix(uStage2Color, uStage3Color, stageProgress);
       return mix(position2, position3, stageProgress);
     }
+    interpolatedColor = uStage2Color;
     return position2;
   }
   // Stage 3 or beyond
   else {
-    if (uStageCount > 3.0) return position3;
-    if (uStageCount > 2.0) return position2;
-    if (uStageCount > 1.0) return position1;
+    if (uStageCount > 3.0) {
+      interpolatedColor = uStage3Color;
+      return position3;
+    }
+    if (uStageCount > 2.0) {
+      interpolatedColor = uStage2Color;
+      return position2;
+    }
+    if (uStageCount > 1.0) {
+      interpolatedColor = uStage1Color;
+      return position1;
+    }
+    interpolatedColor = uStage0Color;
     return position0;
   }
 }
 
 void main() {
-  // Get interpolated position based on current progress
-  vec3 basePosition = getInterpolatedPosition();
+  // Get interpolated position and color based on current progress
+  vec3 interpolatedColor;
+  vec3 basePosition = getInterpolatedPosition(interpolatedColor);
   vec3 finalPosition = basePosition;
+  vColor = interpolatedColor;
   
   // Apply explosion effects for all stages that have it enabled
   if (uHasAnyExplosion > 0.5) {

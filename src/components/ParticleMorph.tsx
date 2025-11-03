@@ -68,15 +68,19 @@ function ParticleSystem({
     sizeRangeMax
   );
 
-  const primaryColor = useMemo(() => {
-    const color = new THREE.Color(colors.primary || '#00ffff');
-    return new THREE.Vector3(color.r, color.g, color.b);
-  }, [colors.primary]);
-
-  const secondaryColor = useMemo(() => {
-    const color = new THREE.Color(colors.secondary || '#0088ff');
-    return new THREE.Vector3(color.r, color.g, color.b);
-  }, [colors.secondary]);
+  // Extract colors from stages or use fallback colors
+  const stageColors = useMemo(() => {
+    const defaultColors = ['#00ffff', '#0088ff', '#ff00ff', '#ffff00'];
+    const colors: THREE.Vector3[] = [];
+    
+    for (let i = 0; i < 4; i++) {
+      const colorStr = stages[i]?.color || defaultColors[i % defaultColors.length];
+      const color = new THREE.Color(colorStr);
+      colors.push(new THREE.Vector3(color.r, color.g, color.b));
+    }
+    
+    return colors;
+  }, [stages]);
 
   const material = useMemo(() => {
     if (!geometry) return null;
@@ -105,8 +109,10 @@ function ParticleSystem({
         uProgress: { value: 0 },
         uPixelRatio: { value: Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, 2) },
         uSize: { value: particleSize },
-        uColorPrimary: { value: primaryColor.clone() },
-        uColorSecondary: { value: secondaryColor.clone() },
+        uStage0Color: { value: stageColors[0].clone() },
+        uStage1Color: { value: stageColors[1].clone() },
+        uStage2Color: { value: stageColors[2].clone() },
+        uStage3Color: { value: stageColors[3].clone() },
         uTime: { value: 0 },
         uAnimationEnabled: { value: animationEnabled ? 1.0 : 0.0 },
         uDampingStrength: { value: animationDampingFactor },
@@ -127,14 +133,16 @@ function ParticleSystem({
     });
     
     return mat;
-  }, [geometry, primaryColor, secondaryColor, particleSize, animationEnabled, animationDampingFactor, driftSpeed, driftAmplitude, stages]);
+  }, [geometry, stageColors, particleSize, animationEnabled, animationDampingFactor, driftSpeed, driftAmplitude, stages]);
 
   useEffect(() => {
     if (material) {
-      material.uniforms.uColorPrimary.value.copy(primaryColor);
-      material.uniforms.uColorSecondary.value.copy(secondaryColor);
+      material.uniforms.uStage0Color.value.copy(stageColors[0]);
+      material.uniforms.uStage1Color.value.copy(stageColors[1]);
+      material.uniforms.uStage2Color.value.copy(stageColors[2]);
+      material.uniforms.uStage3Color.value.copy(stageColors[3]);
     }
-  }, [material, primaryColor, secondaryColor]);
+  }, [material, stageColors]);
 
   useEffect(() => {
     return () => {
@@ -248,7 +256,6 @@ export function ParticleMorph({
     driftSpeed: 0.5,
     driftAmplitude: 0.15
   },
-  background = '#000000',
   className,
   style
 }: ParticleMorphConfig) {
@@ -301,7 +308,6 @@ export function ParticleMorph({
           dpr={[1, 2]}
           performance={{ min: 0.5 }}
           style={{ 
-            background, 
             width: '100%', 
             height: '100%', 
             cursor: isDragging ? 'grabbing' : 'grab',

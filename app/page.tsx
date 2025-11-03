@@ -79,7 +79,7 @@ export default function Home() {
           animation: "pulse 2s ease-in-out infinite",
         }}
       >
-        Scroll down to see multi-stage morph
+        Scroll down to see multi-stage morph with custom 3D model
       </div>
 
       <ParticleMorph
@@ -87,23 +87,21 @@ export default function Home() {
           {
             shape: { type: "box", size: 5, segments: 32 },
             scrollStart: 0,
-            scrollEnd: 0.5,
+            scrollEnd: 0.25,
+            color: "#00ffff",
           },
           {
             shape: { type: "sphere", size: 5, segments: 32 },
-            scrollStart: 0.5,
+            scrollStart: 0.25,
             scrollEnd: 1,
+            color: "#0088ff",
             explosion: {
               enabled: true,
-              radius: 40,
+              radius: 20,
             },
           },
         ]}
-        targetParticleCount={5000}
-        colors={{
-          primary: "#00ffff",
-          secondary: "#0088ff",
-        }}
+        targetParticleCount={8000}
         particleSize={4}
         particleSizeRange={{
           min: 0.1,
@@ -130,7 +128,6 @@ export default function Home() {
           driftSpeed: 2.5,
           driftAmplitude: 0.75,
         }}
-        background="transparent"
       />
 
       <style jsx global>{`
