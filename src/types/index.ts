@@ -1,39 +1,5 @@
 import * as THREE from 'three';
 
-// Core particle configuration
-export interface ParticleMorphConfig {
-  modelPath: string;
-  targetParticleCount?: number;
-  dispersalRadius?: number;
-  colors?: {
-    primary?: string;
-    secondary?: string;
-  };
-  particleSize?: number;
-  bloom?: {
-    enabled?: boolean;
-    strength?: number;
-    radius?: number;
-    threshold?: number;
-  };
-  camera?: {
-    position?: [number, number, number];
-    fov?: number;
-  };
-  rotation?: {
-    enabled?: boolean;
-    dampingFactor?: number;
-    autoRotateSpeed?: number;
-  };
-  scroll?: {
-    enabled?: boolean;
-    triggerHeight?: number;
-  };
-  background?: string;
-  className?: string;
-  style?: React.CSSProperties;
-}
-
 // Particle geometry result
 export interface ParticleGeometryResult {
   geometry: THREE.BufferGeometry | null;
@@ -57,24 +23,69 @@ export interface RotationConfig {
   autoRotateSpeed?: number;
 }
 
-// Scroll config
-export interface ScrollConfig {
+// Particle animation config
+export interface ParticleAnimationConfig {
   enabled?: boolean;
-  triggerHeight?: number;
+  dampingFactor?: number;
+  driftSpeed?: number;
+  driftAmplitude?: number;
 }
 
-// Particle model props
-export interface ParticleModelProps {
-  modelPath: string;
+// Shape configuration for geometric morphing
+export interface ShapeConfig {
+  type: 'sphere' | 'box' | 'torus' | 'cone' | 'cylinder' | 'dodecahedron' | 'octahedron' | 'tetrahedron' | 'model';
+  size?: number;
+  segments?: number;
+  modelPath?: string; // Path to 3D model file (required when type is 'model')
+}
+
+// Multi-stage shape morphing
+export interface ShapeStage {
+  shape: ShapeConfig;
+  scrollStart: number; // 0 to 1
+  scrollEnd: number;   // 0 to 1
+  explosion?: {
+    enabled: boolean;
+    radius: number;
+  };
+}
+
+// Core particle morph configuration
+export interface ParticleMorphConfig {
+  stages: ShapeStage[];
   targetParticleCount?: number;
-  dispersalRadius?: number;
   colors?: {
     primary?: string;
     secondary?: string;
   };
   particleSize?: number;
-  scrollProgress?: number;
-  rotationConfig?: RotationConfig;
-  onDraggingChange?: (isDragging: boolean) => void;
+  particleSizeRange?: {
+    min?: number;
+    max?: number;
+  };
+  bloom?: {
+    enabled?: boolean;
+    strength?: number;
+    radius?: number;
+    threshold?: number;
+  };
+  camera?: {
+    position?: [number, number, number];
+    fov?: number;
+  };
+  rotation?: {
+    enabled?: boolean;
+    dampingFactor?: number;
+    autoRotateSpeed?: number;
+  };
+  particleAnimation?: {
+    enabled?: boolean;
+    dampingFactor?: number;
+    driftSpeed?: number;
+    driftAmplitude?: number;
+  };
+  background?: string;
+  className?: string;
+  style?: React.CSSProperties;
 }
 

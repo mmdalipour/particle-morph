@@ -5,7 +5,9 @@ A highly configurable React component library for creating stunning 3D particle 
 ## 🎯 Features
 
 - 🎨 **Model Particlization** - Convert any 3D GLTF model into interactive particles
+- 🔷 **Shape Morphing** - Morph particles between geometric shapes (sphere, cube, torus, etc.)
 - 🎭 **Smooth Morphing** - Seamless transitions between particle states
+- ✨ **Dust-Like Animation** - Per-particle damping with unique movement patterns
 - 🖱️ **Interactive Rotation** - Drag to rotate with inertia and smooth damping
 - 📜 **Scroll Integration** - Animate particles based on scroll progress
 - 💫 **Bloom Effects** - Beautiful glow effects with postprocessing
@@ -108,6 +110,10 @@ The main component for creating particle morph effects.
     secondary: '#0088ff'
   }}
   particleSize={3}                     // Optional: Particle size
+  particleSizeRange={{                 // Optional: Random size variation
+    min: 0.2,
+    max: 2.0
+  }}
   bloom={{                             // Optional: Bloom effect
     enabled: true,
     strength: 1.5,
@@ -127,9 +133,45 @@ The main component for creating particle morph effects.
     enabled: true,
     triggerHeight: 2
   }}
+  particleAnimation={{                 // Optional: Per-particle animation
+    enabled: true,
+    dampingFactor: 0.5,
+    driftSpeed: 0.5,
+    driftAmplitude: 0.15
+  }}
   background="#000000"                 // Optional: Background color
 />
 ```
+
+### ParticleShapeMorph Component
+
+Morph particles between geometric shapes instead of using 3D models.
+
+```tsx
+<ParticleShapeMorph
+  shapeA={{ type: 'sphere', size: 5, segments: 32 }}
+  shapeB={{ type: 'box', size: 5, segments: 32 }}
+  targetParticleCount={5000}
+  colors={{
+    primary: '#00ffff',
+    secondary: '#0088ff'
+  }}
+  scroll={{
+    enabled: true,
+    triggerHeight: 2
+  }}
+/>
+```
+
+**Available Shapes:**
+- `sphere` - Spherical shape
+- `box` - Cubic/box shape
+- `torus` - Donut/ring shape
+- `cone` - Conical shape
+- `cylinder` - Cylindrical shape
+- `dodecahedron` - 12-sided polyhedron
+- `octahedron` - 8-sided polyhedron
+- `tetrahedron` - 4-sided polyhedron
 
 ### ParticleModel Component
 
@@ -186,6 +228,29 @@ const progress = useScrollProgress(2); // 2 viewport heights
 
 ## 🎨 Customization Examples
 
+### Shape Morphing
+
+Morph between different geometric shapes:
+
+```tsx
+// Sphere to Cube
+<ParticleShapeMorph
+  shapeA={{ type: 'sphere', size: 5 }}
+  shapeB={{ type: 'box', size: 5 }}
+  targetParticleCount={5000}
+/>
+
+// Torus to Cone
+<ParticleShapeMorph
+  shapeA={{ type: 'torus', size: 5 }}
+  shapeB={{ type: 'cone', size: 5 }}
+  colors={{
+    primary: '#ff00ff',
+    secondary: '#8800ff'
+  }}
+/>
+```
+
 ### Custom Colors
 
 ```tsx
@@ -219,6 +284,48 @@ const progress = useScrollProgress(2); // 2 viewport heights
   }}
 />
 ```
+
+### Dust-Like Particle Animation
+
+Each particle has its own damping animation with unique random seeds, creating a natural dust-like floating effect:
+
+```tsx
+<ParticleMorph
+  modelPath="/models/sphere.glb"
+  particleAnimation={{
+    enabled: true,
+    dampingFactor: 0.7,      // 0.0 to 1.0 - controls overall animation intensity
+    driftSpeed: 0.5,          // Speed of the dust-like drift movement
+    driftAmplitude: 0.15      // How far particles drift from their position
+  }}
+/>
+```
+
+- **dampingFactor**: Controls the overall intensity of per-particle animation (0.0 = no animation, 1.0 = full animation)
+- **driftSpeed**: Speed at which particles drift (lower = slower, smoother movement)
+- **driftAmplitude**: Maximum distance particles can drift from their base position
+- Each particle has unique movement patterns for a natural, organic look
+- Particles rotate with the object while maintaining their individual drift motion
+
+### Custom Particle Size Range
+
+Control the variation in particle sizes for more natural or dramatic effects:
+
+```tsx
+<ParticleMorph
+  modelPath="/models/sphere.glb"
+  particleSize={3}              // Base particle size
+  particleSizeRange={{
+    min: 0.5,                    // Minimum size multiplier (0.5x base size)
+    max: 1.5                     // Maximum size multiplier (1.5x base size)
+  }}
+/>
+```
+
+- **min**: Minimum size multiplier (default: 0.2) - smaller values create tinier particles
+- **max**: Maximum size multiplier (default: 2.0) - larger values create bigger particles
+- Creates depth and visual interest with varied particle scales
+- Each particle gets a unique random size within the specified range
 
 ## 📦 Publishing to NPM
 

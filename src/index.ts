@@ -1,17 +1,17 @@
-// Main components
+// Main component
 export { ParticleMorph } from './components/ParticleMorph';
-export { ParticleModel } from './components/ParticleModel';
 
 // Hooks
 export { 
   useInteractiveRotation, 
   useScrollProgress, 
-  useParticleGeometry,
-  preloadModel 
+  useMultiShapeMorphGeometry
 } from './hooks';
 
 // Utils
-export { convertModelToParticles } from './utils/modelToParticles';
+export { generateShapeParticles } from './utils/shapeToParticles';
+export { generateMultiShapeParticles } from './utils/multiShapeToParticles';
+export type { ShapeType, ShapeConfig as ShapeConfigUtil } from './utils/shapeToParticles';
 
 // Types
 export type {
@@ -19,7 +19,8 @@ export type {
   ParticleGeometryResult,
   UseInteractiveRotationReturn,
   RotationConfig,
-  ScrollConfig,
-  ParticleModelProps
+  ParticleAnimationConfig,
+  ShapeConfig,
+  ShapeStage
 } from './types';
 
