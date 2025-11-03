@@ -65,30 +65,6 @@ export default function Home() {
 
   return (
     <>
-      {/* Progress indicator */}
-      <div
-        style={{
-          position: "fixed",
-          top: "20px",
-          right: "20px",
-          zIndex: 1000,
-          background: "rgba(0, 0, 0, 0.7)",
-          padding: "15px 20px",
-          borderRadius: "8px",
-          border: "1px solid #00ffff",
-          color: "#00ffff",
-          fontSize: "14px",
-          lineHeight: "1.6",
-        }}
-      >
-        <div style={{ fontWeight: "bold", marginBottom: "8px" }}>
-          Scroll Progress:
-        </div>
-        <div>0-30%: Tetrahedron + Explosion</div>
-        <div>30-50%: Box + Explosion</div>
-        <div>50-100%: Sphere (no explosion)</div>
-      </div>
-
       {/* Scroll hint */}
       <div
         style={{
@@ -117,6 +93,10 @@ export default function Home() {
             shape: { type: "sphere", size: 5, segments: 32 },
             scrollStart: 0.5,
             scrollEnd: 1,
+            explosion: {
+              enabled: true,
+              radius: 40,
+            },
           },
         ]}
         targetParticleCount={5000}
