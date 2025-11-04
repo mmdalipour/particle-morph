@@ -27,25 +27,25 @@ export default function ColorTransitionsExample() {
       <ParticleMorph
         stages={[
           {
-            shape: { type: "sphere", size: 5, segments: 32 },
+            shape: { type: "sphere", size: 5 },
             scrollStart: 0,
             scrollEnd: 0.2,
             color: "#ff0000", // Red
           },
           {
-            shape: { type: "torus", size: 3, segments: 32 },
+            shape: { type: "torus", size: 3 },
             scrollStart: 0.2,
             scrollEnd: 0.4,
             color: "#ff8800", // Orange
           },
           {
-            shape: { type: "box", size: 5, segments: 32 },
+            shape: { type: "box", size: 5 },
             scrollStart: 0.4,
             scrollEnd: 0.6,
             color: "#00ff00", // Green
           },
           {
-            shape: { type: "cone", size: 5, segments: 32 },
+            shape: { type: "cone", size: 5 },
             scrollStart: 0.6,
             scrollEnd: 0.8,
             color: "#0088ff", // Blue

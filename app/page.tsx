@@ -79,29 +79,27 @@ export default function Home() {
           animation: "pulse 2s ease-in-out infinite",
         }}
       >
-        Scroll down to see multi-stage morph with custom 3D model
+        Scroll down to see the magic
       </div>
 
       <ParticleMorph
         stages={[
           {
-            shape: { type: "box", size: 5, segments: 32 },
+            shape: { type: "box", size: 5 },
             scrollStart: 0,
             scrollEnd: 0.25,
-            color: "#00ffff",
           },
           {
-            shape: { type: "sphere", size: 5, segments: 32 },
+            shape: { type: "sphere", size: 5 },
             scrollStart: 0.25,
             scrollEnd: 1,
-            color: "#0088ff",
             explosion: {
               enabled: true,
               radius: 20,
             },
           },
         ]}
-        targetParticleCount={8000}
+        targetParticleCount={5000}
         particleSize={4}
         particleSizeRange={{
           min: 0.1,
@@ -122,6 +120,7 @@ export default function Home() {
           dampingFactor: 0.08,
           autoRotateSpeed: 0.001,
         }}
+        particleColor="#00ffff"
         particleAnimation={{
           enabled: true,
           dampingFactor: 2,

@@ -53,13 +53,13 @@ export default function CustomModelExample() {
             color: "#00ffff",
           },
           {
-            shape: { type: "torus", size: 4, segments: 32 },
+            shape: { type: "torus", size: 4 },
             scrollStart: 0.33,
             scrollEnd: 0.66,
             color: "#ff00ff",
           },
           {
-            shape: { type: "box", size: 5, segments: 32 },
+            shape: { type: "box", size: 5 },
             scrollStart: 0.66,
             scrollEnd: 1,
             color: "#ffff00",

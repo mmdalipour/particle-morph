@@ -17,7 +17,7 @@ import fragmentShader from '../shaders/particleMorph.frag.glsl';
 function ParticleSystem({
   stages,
   targetParticleCount,
-  colors,
+  particleColor,
   particleSize,
   particleSizeRange,
   scrollProgress,
@@ -27,7 +27,7 @@ function ParticleSystem({
 }: {
   stages: ParticleMorphConfig['stages'];
   targetParticleCount: number;
-  colors: { primary?: string; secondary?: string };
+  particleColor: string;
   particleSize: number;
   particleSizeRange: { min?: number; max?: number };
   scrollProgress: number;
@@ -68,19 +68,19 @@ function ParticleSystem({
     sizeRangeMax
   );
 
-  // Extract colors from stages or use fallback colors
+  // Extract colors from stages - stage color takes priority over default particleColor
   const stageColors = useMemo(() => {
-    const defaultColors = ['#00ffff', '#0088ff', '#ff00ff', '#ffff00'];
     const colors: THREE.Vector3[] = [];
     
     for (let i = 0; i < 4; i++) {
-      const colorStr = stages[i]?.color || defaultColors[i % defaultColors.length];
+      // Stage color has priority, fallback to particleColor prop
+      const colorStr = stages[i]?.color || particleColor;
       const color = new THREE.Color(colorStr);
       colors.push(new THREE.Vector3(color.r, color.g, color.b));
     }
     
     return colors;
-  }, [stages]);
+  }, [stages, particleColor]);
 
   const material = useMemo(() => {
     if (!geometry) return null;
@@ -157,7 +157,9 @@ function ParticleSystem({
 
   useFrame((state) => {
     if (material) {
-      if (material.uniforms.uProgress.value !== progressRef.current) {
+      // Only update if progress changed significantly (reduces GPU updates)
+      const progressDiff = Math.abs(material.uniforms.uProgress.value - progressRef.current);
+      if (progressDiff > 0.001) {
         material.uniforms.uProgress.value = progressRef.current;
       }
       
@@ -211,7 +213,7 @@ function ParticleSystem({
  * <ParticleMorph
  *   stages={[
  *     { shape: { type: 'sphere', size: 5 }, scrollStart: 0, scrollEnd: 0.3 },
- *     { shape: { type: 'box', size: 5 }, scrollStart: 0.3, scrollEnd: 0.5 },
+ *     { shape: { type: 'box', size: 5 }, scrollStart: 0.3, scrollEnd: 0.5, color: '#ff0000' },
  *     { 
  *       shape: { type: 'torus', size: 5 }, 
  *       scrollStart: 0.5, 
@@ -219,6 +221,7 @@ function ParticleSystem({
  *       explosion: { enabled: true, radius: 40 }
  *     }
  *   ]}
+ *   particleColor="#00ffff"
  *   targetParticleCount={5000}
  * />
  * ```
@@ -226,10 +229,7 @@ function ParticleSystem({
 export function ParticleMorph({
   stages,
   targetParticleCount = 5000,
-  colors = {
-    primary: '#00ffff',
-    secondary: '#0088ff'
-  },
+  particleColor = '#ffffff',
   particleSize = 3,
   particleSizeRange = {
     min: 0.2,
@@ -299,14 +299,16 @@ export function ParticleMorph({
             fov: cameraFov
           }}
           gl={{ 
-            antialias: true,
+            antialias: false, // Disable antialiasing for better performance
             powerPreference: 'high-performance',
-            alpha: true,
+            alpha: true, // Enable alpha for transparency
             stencil: false,
-            depth: true
+            depth: true,
+            precision: 'mediump' // Use medium precision for better performance
           }}
-          dpr={[1, 2]}
-          performance={{ min: 0.5 }}
+          dpr={[1, 1.5]} // Reduce max DPR from 2 to 1.5
+          performance={{ min: 0.5, max: 1 }}
+          frameloop="always"
           style={{ 
             width: '100%', 
             height: '100%', 
@@ -317,7 +319,7 @@ export function ParticleMorph({
           <ParticleSystem
             stages={stages}
             targetParticleCount={targetParticleCount}
-            colors={colors}
+            particleColor={particleColor}
             particleSize={particleSize}
             particleSizeRange={particleSizeRange}
             scrollProgress={scrollProgress}
@@ -327,11 +329,14 @@ export function ParticleMorph({
           />
 
           {bloomEnabled && (
-            <EffectComposer>
+            <EffectComposer multisampling={0}>
               <Bloom
                 intensity={bloomStrength}
                 luminanceThreshold={bloomThreshold}
                 luminanceSmoothing={bloomRadius}
+                mipmapBlur={true}
+                levels={5}
+                radius={bloomRadius}
               />
             </EffectComposer>
           )}

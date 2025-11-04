@@ -42,19 +42,19 @@ export default function HighParticleCountExample() {
       <ParticleMorph
         stages={[
           {
-            shape: { type: "sphere", size: 6, segments: 48 },
+            shape: { type: "sphere", size: 6 },
             scrollStart: 0,
             scrollEnd: 0.33,
             color: "#00ffff",
           },
           {
-            shape: { type: "torus", size: 4, segments: 48 },
+            shape: { type: "torus", size: 4 },
             scrollStart: 0.33,
             scrollEnd: 0.66,
             color: "#ff00ff",
           },
           {
-            shape: { type: "dodecahedron", size: 6, segments: 0 },
+            shape: { type: "dodecahedron", size: 6 },
             scrollStart: 0.66,
             scrollEnd: 1,
             color: "#ffff00",

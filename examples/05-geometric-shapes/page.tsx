@@ -29,25 +29,25 @@ export default function GeometricShapesExample() {
       <ParticleMorph
         stages={[
           {
-            shape: { type: "sphere", size: 5, segments: 32 },
+            shape: { type: "sphere", size: 5 },
             scrollStart: 0,
             scrollEnd: 0.125,
             color: "#ff0066",
           },
           {
-            shape: { type: "box", size: 5, segments: 32 },
+            shape: { type: "box", size: 5 },
             scrollStart: 0.125,
             scrollEnd: 0.25,
             color: "#ff6600",
           },
           {
-            shape: { type: "torus", size: 3, segments: 32 },
+            shape: { type: "torus", size: 3 },
             scrollStart: 0.25,
             scrollEnd: 0.375,
             color: "#ffcc00",
           },
           {
-            shape: { type: "cone", size: 5, segments: 32 },
+            shape: { type: "cone", size: 5 },
             scrollStart: 0.375,
             scrollEnd: 0.5,
             color: "#66ff00",

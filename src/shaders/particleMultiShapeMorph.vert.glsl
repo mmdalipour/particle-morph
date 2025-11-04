@@ -37,23 +37,19 @@ uniform vec3 uStage3Color;
 varying float vDistance;
 varying vec3 vColor;
 
-// Smooth ease-in for explosion expansion (starts slow, accelerates gradually)
+// Realistic explosion expansion - fast burst with deceleration
+// Simulates initial explosive force that slows down over time
 float smoothExplosionExpand(float t) {
-  // Cubic ease-in-out for smooth start
-  float smoothed = smoothstep(0.0, 1.0, t);
-  // Apply another layer of smoothing
-  return smoothed * smoothed;
+  // Exponential ease-out for realistic physics
+  // Fast start that decelerates (like real explosions)
+  return 1.0 - exp(-4.0 * t);
 }
 
-// Ultra smooth easing function for explosion reverse
-// Combines exponential and smoothstep for maximum smoothness
+// Realistic implosion/gathering - accelerates as particles are pulled back
 float smoothExplosionReverse(float t) {
-  // First apply smoothstep for initial smoothness
-  float smoothed = smoothstep(0.0, 1.0, t);
-  // Then apply exponential ease-out for extra smoothness
-  smoothed = 1.0 - exp(-5.0 * smoothed);
-  // Normalize back to 0-1 range
-  return smoothed / (1.0 - exp(-5.0));
+  // Exponential ease-in for accelerating implosion
+  // Starts slow and speeds up (like gravity pulling inward)
+  return exp(4.0 * (t - 1.0));
 }
 
 vec3 getInterpolatedPosition(out vec3 interpolatedColor) {
@@ -214,46 +210,63 @@ void main() {
       // Apply explosion offset if intensity > 0
       if (explosionIntensity > 0.0) {
         // Calculate direction from the explosion stage position
-        vec3 direction = normalize(explosionStagePosition);
+        float posLen = length(explosionStagePosition);
+        vec3 direction = posLen > 0.001 ? explosionStagePosition / posLen : animationSeed;
         
-        if (length(explosionStagePosition) < 0.001) {
-          direction = normalize(animationSeed);
-        }
+        // Pre-compute hash values for randomness (reuse calculations)
+        float hash1 = animationSeed.x * 12.9898 + animationSeed.y * 78.233 + float(i) * 43.758;
+        float hash2 = animationSeed.y * 12.9898 + animationSeed.z * 78.233 + float(i) * 43.758;
+        float hash3 = animationSeed.z * 12.9898 + animationSeed.x * 78.233 + float(i) * 43.758;
         
-        // Add consistent randomness per particle
-        vec3 randomOffset = normalize(vec3(
-          sin(animationSeed.x * 12.9898 + animationSeed.y * 78.233 + float(i) * 43.758) * 2.0 - 1.0,
-          sin(animationSeed.y * 12.9898 + animationSeed.z * 78.233 + float(i) * 43.758) * 2.0 - 1.0,
-          sin(animationSeed.z * 12.9898 + animationSeed.x * 78.233 + float(i) * 43.758) * 2.0 - 1.0
-        ));
+        // Generate chaotic randomness per particle
+        vec3 randomOffset = vec3(
+          sin(hash1) * 2.0 - 1.0,
+          sin(hash2) * 2.0 - 1.0,
+          sin(hash3) * 2.0 - 1.0
+        );
         
-        vec3 messyDirection = normalize(direction * 0.7 + randomOffset * 0.3);
-        float easedIntensity = explosionIntensity * explosionIntensity;
+        // More chaotic direction - higher randomness for realistic explosion
+        vec3 mixedDirection = direction * 0.4 + randomOffset * 0.6;
+        float mixLen = length(mixedDirection);
+        vec3 chaoticDirection = mixLen > 0.001 ? mixedDirection / mixLen : direction;
         
-        totalExplosionOffset += messyDirection * explosionRadius * easedIntensity;
+        // Variable particle speeds - some particles fly faster than others
+        float speedVariation = 0.5 + abs(sin(animationSeed.x * 27.182 + animationSeed.z * 31.415)) * 0.8;
+        
+        // Add turbulence/rotation during explosion (optimized)
+        float turbulenceAngle = (animationSeed.x + animationSeed.y) * 6.28318;
+        float turbulence = sin(turbulenceAngle + explosionIntensity * 3.0) * 0.15;
+        vec3 turbulentOffset = vec3(
+          cos(turbulenceAngle) * turbulence,
+          sin(turbulenceAngle * 1.3) * turbulence,
+          cos(turbulenceAngle * 0.7) * turbulence
+        );
+        
+        // Combine all effects for realistic explosion
+        vec3 finalDirection = chaoticDirection + turbulentOffset;
+        
+        totalExplosionOffset += finalDirection * explosionRadius * explosionIntensity * speedVariation;
       }
     }
     
     finalPosition += totalExplosionOffset;
   }
   
-  // Apply dust-like damping animation if enabled
+  // Apply dust-like damping animation if enabled (optimized)
   if (uAnimationEnabled > 0.5) {
-    float timeX = uTime * uDriftSpeed + animationSeed.x;
-    float timeY = uTime * uDriftSpeed + animationSeed.y;
-    float timeZ = uTime * uDriftSpeed + animationSeed.z;
+    // Pre-calculate time offsets
+    float baseTime = uTime * uDriftSpeed;
+    vec3 timeOffsets = baseTime + animationSeed;
     
+    // Simplified drift calculation with fewer trig operations
     vec3 drift = vec3(
-      sin(timeX) * cos(timeY * 0.7),
-      sin(timeY) * cos(timeZ * 0.8),
-      sin(timeZ) * cos(timeX * 0.6)
+      sin(timeOffsets.x) * cos(timeOffsets.y * 0.7),
+      sin(timeOffsets.y) * cos(timeOffsets.z * 0.8),
+      sin(timeOffsets.z) * cos(timeOffsets.x * 0.6)
     );
     
-    float particleDamping = mix(0.3, 1.0, dampingFactor);
-    float totalDamping = particleDamping * uDampingStrength;
-    
-    float baseAnimation = 0.2;
-    float driftScale = uDriftAmplitude * totalDamping * baseAnimation;
+    // Combine multiplications
+    float driftScale = uDriftAmplitude * mix(0.06, 0.2, dampingFactor) * uDampingStrength;
     
     finalPosition += drift * driftScale;
   }

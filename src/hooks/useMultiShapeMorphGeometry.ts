@@ -123,7 +123,6 @@ export function useMultiShapeMorphGeometry(
     JSON.stringify(stages.map(s => ({
       shape: s.shape.type,
       size: s.shape.size,
-      segments: s.shape.segments,
       modelPath: s.shape.modelPath,
       start: s.scrollStart,
       end: s.scrollEnd,

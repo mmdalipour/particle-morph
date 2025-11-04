@@ -27,28 +27,46 @@ export function useScrollProgress(enabled: boolean = true): number {
       }
     });
 
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const viewportHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-      
-      // Calculate scrollable height (total document height minus viewport)
-      const scrollableHeight = documentHeight - viewportHeight;
+    let rafId: number | null = null;
+    let lastScrollTime = 0;
+    const throttleDelay = 8; // ~120fps throttle for smooth performance
 
-      if (scrollableHeight <= 0) {
-        // No scroll available
-        if (quickToRef.current) {
-          quickToRef.current(0);
-        }
+    const handleScroll = () => {
+      const now = performance.now();
+      if (now - lastScrollTime < throttleDelay) {
         return;
       }
+      lastScrollTime = now;
 
-      const rawProgress = scrollY / scrollableHeight;
-      const clampedProgress = Math.max(0, Math.min(1, rawProgress));
-
-      if (quickToRef.current) {
-        quickToRef.current(clampedProgress);
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
       }
+
+      rafId = requestAnimationFrame(() => {
+        const scrollY = window.scrollY;
+        const viewportHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+        
+        // Calculate scrollable height (total document height minus viewport)
+        const scrollableHeight = documentHeight - viewportHeight;
+
+        if (scrollableHeight <= 0) {
+          // No scroll available
+          if (quickToRef.current) {
+            quickToRef.current(0);
+          }
+          return;
+        }
+
+        const rawProgress = scrollY / scrollableHeight;
+        const clampedProgress = Math.max(0, Math.min(1, rawProgress));
+
+        if (quickToRef.current) {
+          quickToRef.current(clampedProgress);
+        }
+        
+        rafId = null;
+      });
     };
 
     handleScroll();
@@ -58,6 +76,9 @@ export function useScrollProgress(enabled: boolean = true): number {
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
     };
   }, [enabled]);
 

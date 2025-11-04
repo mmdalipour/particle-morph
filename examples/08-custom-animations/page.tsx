@@ -42,13 +42,13 @@ export default function CustomAnimationsExample() {
       <ParticleMorph
         stages={[
           {
-            shape: { type: "sphere", size: 5, segments: 32 },
+            shape: { type: "sphere", size: 5 },
             scrollStart: 0,
             scrollEnd: 0.5,
             color: "#00ffff",
           },
           {
-            shape: { type: "octahedron", size: 5, segments: 0 },
+            shape: { type: "octahedron", size: 5 },
             scrollStart: 0.5,
             scrollEnd: 1,
             color: "#ff00ff",

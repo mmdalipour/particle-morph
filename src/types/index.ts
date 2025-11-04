@@ -34,8 +34,7 @@ export interface ParticleAnimationConfig {
 // Shape configuration for geometric morphing
 export interface ShapeConfig {
   type: 'sphere' | 'box' | 'torus' | 'cone' | 'cylinder' | 'dodecahedron' | 'octahedron' | 'tetrahedron' | 'model';
-  size?: number;
-  segments?: number;
+  size?: number; // Size of the shape (default: 5)
   modelPath?: string; // Path to 3D model file (required when type is 'model')
 }
 
@@ -55,10 +54,7 @@ export interface ShapeStage {
 export interface ParticleMorphConfig {
   stages: ShapeStage[];
   targetParticleCount?: number;
-  colors?: {
-    primary?: string;
-    secondary?: string;
-  };
+  particleColor?: string; // Default color for all stages (can be overridden per stage)
   particleSize?: number;
   particleSizeRange?: {
     min?: number;

@@ -6,7 +6,6 @@ export type ShapeType = 'sphere' | 'box' | 'torus' | 'cone' | 'cylinder' | 'dode
 export interface ShapeConfig {
   type: ShapeType;
   size?: number;
-  segments?: number;
   modelPath?: string;
 }
 
@@ -109,7 +108,7 @@ export async function generateShapeParticles(
   particleScales: Float32Array;
 }> {
   const size = config.size ?? 5;
-  const segments = config.segments ?? 32;
+  const SEGMENTS = 32; // Fixed mesh resolution
   
   let geometry: THREE.BufferGeometry;
   let sourcePositions: Float32Array;
@@ -120,22 +119,41 @@ export async function generateShapeParticles(
     }
     const model = await loadModel(config.modelPath);
     sourcePositions = extractModelPositions(model, size);
+  } else if (config.type === 'sphere') {
+    // Use Fibonacci sphere distribution for uniform particle spread
+    // This avoids the grid pattern that THREE.SphereGeometry creates
+    const radius = size / 2;
+    const goldenRatio = (1 + Math.sqrt(5)) / 2;
+    const angleIncrement = Math.PI * 2 * goldenRatio;
+    
+    const tempPositions: number[] = [];
+    
+    for (let i = 0; i < particleCount; i++) {
+      const t = i / particleCount;
+      const inclination = Math.acos(1 - 2 * t);
+      const azimuth = angleIncrement * i;
+      
+      const x = radius * Math.sin(inclination) * Math.cos(azimuth);
+      const y = radius * Math.sin(inclination) * Math.sin(azimuth);
+      const z = radius * Math.cos(inclination);
+      
+      tempPositions.push(x, y, z);
+    }
+    
+    sourcePositions = new Float32Array(tempPositions);
   } else {
     switch (config.type) {
-      case 'sphere':
-        geometry = new THREE.SphereGeometry(size / 2, segments, segments);
-        break;
       case 'box':
-        geometry = new THREE.BoxGeometry(size, size, size, segments, segments, segments);
+        geometry = new THREE.BoxGeometry(size, size, size, SEGMENTS, SEGMENTS, SEGMENTS);
         break;
       case 'torus':
-        geometry = new THREE.TorusGeometry(size / 2, size / 6, segments / 2, segments);
+        geometry = new THREE.TorusGeometry(size / 2, size / 6, SEGMENTS / 2, SEGMENTS);
         break;
       case 'cone':
-        geometry = new THREE.ConeGeometry(size / 2, size, segments);
+        geometry = new THREE.ConeGeometry(size / 2, size, SEGMENTS);
         break;
       case 'cylinder':
-        geometry = new THREE.CylinderGeometry(size / 2, size / 2, size, segments);
+        geometry = new THREE.CylinderGeometry(size / 2, size / 2, size, SEGMENTS);
         break;
       case 'dodecahedron':
         geometry = new THREE.DodecahedronGeometry(size / 2, 0);
@@ -147,7 +165,7 @@ export async function generateShapeParticles(
         geometry = new THREE.TetrahedronGeometry(size / 2, 0);
         break;
       default:
-        geometry = new THREE.SphereGeometry(size / 2, segments, segments);
+        geometry = new THREE.SphereGeometry(size / 2, SEGMENTS, SEGMENTS);
     }
 
     // Convert indexed geometry to non-indexed for easier sampling
@@ -168,7 +186,10 @@ export async function generateShapeParticles(
   const dampingFactors = new Float32Array(particleCount);
   const particleScales = new Float32Array(particleCount);
 
-  if (vertexCount === particleCount) {
+  // For Fibonacci sphere, positions are already generated at the target count
+  if (config.type === 'sphere') {
+    positions.set(sourcePositions);
+  } else if (vertexCount === particleCount) {
     // Exact match, use all vertices
     positions.set(sourcePositions);
   } else if (vertexCount > particleCount) {

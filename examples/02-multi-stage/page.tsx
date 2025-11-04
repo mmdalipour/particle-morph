@@ -27,25 +27,25 @@ export default function MultiStageExample() {
       <ParticleMorph
         stages={[
           {
-            shape: { type: "sphere", size: 5, segments: 32 },
+            shape: { type: "sphere", size: 5 },
             scrollStart: 0,
             scrollEnd: 0.25,
             color: "#00ffff",
           },
           {
-            shape: { type: "torus", size: 3, segments: 32 },
+            shape: { type: "torus", size: 3 },
             scrollStart: 0.25,
             scrollEnd: 0.5,
             color: "#0088ff",
           },
           {
-            shape: { type: "dodecahedron", size: 5, segments: 0 },
+            shape: { type: "dodecahedron", size: 5 },
             scrollStart: 0.5,
             scrollEnd: 0.75,
             color: "#ff00ff",
           },
           {
-            shape: { type: "octahedron", size: 5, segments: 0 },
+            shape: { type: "octahedron", size: 5 },
             scrollStart: 0.75,
             scrollEnd: 1,
             color: "#ffff00",
