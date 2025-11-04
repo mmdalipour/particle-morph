@@ -2,7 +2,6 @@
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import { useScrollProgress } from '../hooks/useScrollProgress';
 import { useMultiShapeMorphGeometry } from '../hooks/useMultiShapeMorphGeometry';
@@ -66,7 +65,8 @@ function ParticleSystem({
     initialRotation,
     autoRotateEnabled,
     autoRotateDampingFactor,
-    autoRotateSpeed
+    autoRotateSpeed,
+    interactiveEnabled
   );
 
   useEffect(() => {
@@ -266,12 +266,6 @@ export function ParticleMorph({
     min: 0.2,
     max: 2.0
   },
-  bloom = {
-    enabled: true,
-    strength: 1.5,
-    radius: 0.8,
-    threshold: 0.1
-  },
   camera = {
     position: [0, 0, 10],
     fov: 75
@@ -297,11 +291,6 @@ export function ParticleMorph({
   
   const [isDragging, setIsDragging] = useState(false);
   const canvasRef = useRef<HTMLDivElement>(null);
-
-  const bloomEnabled = bloom?.enabled !== false;
-  const bloomStrength = bloom?.strength ?? 1.5;
-  const bloomRadius = bloom?.radius ?? 0.8;
-  const bloomThreshold = bloom?.threshold ?? 0.1;
 
   const cameraPosition = camera?.position ?? [0, 0, 10];
   const cameraFov = camera?.fov ?? 75;
@@ -365,19 +354,6 @@ export function ParticleMorph({
             glowConfig={glow}
             onDraggingChange={setIsDragging}
           />
-
-          {bloomEnabled && (
-            <EffectComposer multisampling={0}>
-              <Bloom
-                intensity={bloomStrength}
-                luminanceThreshold={bloomThreshold}
-                luminanceSmoothing={bloomRadius}
-                mipmapBlur={true}
-                levels={5}
-                radius={bloomRadius}
-              />
-            </EffectComposer>
-          )}
         </Canvas>
       </div>
     </div>

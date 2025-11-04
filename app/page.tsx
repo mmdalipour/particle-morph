@@ -110,7 +110,6 @@ export default function Home() {
           position: [0, 0, 10],
           fov: 75,
         }}
-        interactive
         rotation={{
           x: 0.3, // Initial tilt on X axis (radians)
           y: 0.7, // Initial rotation on Y axis (radians)

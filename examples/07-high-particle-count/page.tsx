@@ -66,12 +66,6 @@ export default function HighParticleCountExample() {
           min: 0.1,
           max: 1.5,
         }}
-        bloom={{
-          enabled: true,
-          strength: 1.2,
-          radius: 0.7,
-          threshold: 0.2,
-        }}
         camera={{
           position: [0, 0, 14],
           fov: 75,

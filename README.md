@@ -10,7 +10,7 @@ A highly configurable React component library for creating stunning 3D particle 
 - ✨ **Dust-Like Animation** - Per-particle damping with unique movement patterns
 - 🖱️ **Interactive Rotation** - Drag to rotate with inertia and smooth damping
 - 📜 **Scroll Integration** - Animate particles based on scroll progress
-- 💫 **Bloom Effects** - Beautiful glow effects with postprocessing
+- 💫 **Glow Effects** - Beautiful particle glow with customizable intensity
 - ⚙️ **Highly Configurable** - Customize colors, sizes, behaviors, and more
 - 🎯 **TypeScript** - Full TypeScript support with comprehensive types
 - 📦 **Modular Architecture** - Use individual components and hooks as needed
@@ -113,12 +113,6 @@ The main component for creating particle morph effects.
   particleSizeRange={{                 // Optional: Random size variation
     min: 0.2,
     max: 2.0
-  }}
-  bloom={{                             // Optional: Bloom effect
-    enabled: true,
-    strength: 1.5,
-    radius: 0.8,
-    threshold: 0.1
   }}
   camera={{                            // Optional: Camera config
     position: [0, 0, 10],
@@ -375,7 +369,7 @@ npm install particle-morph
 3. **Scattered Positions**: Radial dispersion calculated for each particle
 4. **Shader Morphing**: GLSL shaders interpolate between states
 5. **Scroll Tracking**: GSAP smooths scroll to 0-1 progress
-6. **Post-Processing**: Bloom effect adds glow
+6. **Glow Effects**: Shader-based particle glow
 
 ## 🎯 Use Cases
 

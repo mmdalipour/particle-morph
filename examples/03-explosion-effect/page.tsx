@@ -64,12 +64,6 @@ export default function ExplosionExample() {
           min: 0.1,
           max: 2.5,
         }}
-        bloom={{
-          enabled: true,
-          strength: 2.5,
-          radius: 1.0,
-          threshold: 0.05,
-        }}
         camera={{
           position: [0, 0, 15],
           fov: 75,

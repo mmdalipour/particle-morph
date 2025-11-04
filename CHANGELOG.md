@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.2] - 2025-11-04
+
+### Fixed
+- **Interactive Prop Bug**: Fixed issue where particles were still interactible even when `interactive={false}`
+  - `useInteractiveRotation` hook now properly respects the `interactive` flag
+  - Pointer events are completely disabled when interactive is false
+  - Momentum effects are disabled when interactive is false
+  - Auto-rotation still works as expected when interactive is disabled
+
 ## [1.4.1] - 2025-11-04
 
 ### Added
@@ -115,7 +124,6 @@ All notable changes to this project will be documented in this file.
   - Reduced device pixel ratio from 2.0 to 1.5
   - Disabled antialiasing for better GPU performance
   - Medium precision shaders instead of high precision
-  - Optimized bloom rendering with multisampling disabled
   - Combined multiplication operations in shaders
   - Cleaner explosion calculations with cached values
 
@@ -165,6 +173,6 @@ All notable changes to this project will be documented in this file.
 - Smooth morphing transitions
 - Interactive rotation with damping
 - Scroll integration
-- Bloom effects
+- Glow effects
 - Full TypeScript support
 

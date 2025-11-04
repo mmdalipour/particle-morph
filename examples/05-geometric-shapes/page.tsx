@@ -59,12 +59,6 @@ export default function GeometricShapesExample() {
           min: 0.2,
           max: 2.0,
         }}
-        bloom={{
-          enabled: true,
-          strength: 1.8,
-          radius: 0.9,
-          threshold: 0.1,
-        }}
         camera={{
           position: [0, 0, 12],
           fov: 75,

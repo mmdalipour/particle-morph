@@ -10,7 +10,7 @@ A highly configurable React component for creating stunning 3D particle morph ef
 - 🌈 **Color Transitions** - Smooth color transitions between stages
 - 🖱️ **Interactive Rotation** - Drag to rotate with inertia and smooth damping
 - 📜 **Scroll Integration** - Animate based on scroll progress with smooth interpolation
-- 💫 **Bloom Effects** - Beautiful glow effects with postprocessing
+- 💫 **Glow Effects** - Beautiful particle glow with customizable intensity
 - ⚡ **Optimized Performance** - Highly optimized shaders and rendering pipeline
 - 🎯 **TypeScript** - Full TypeScript support with comprehensive types
 - 📦 **Tree-shakeable** - Modular exports for optimal bundle size
@@ -78,12 +78,6 @@ interface ParticleMorphConfig {
   particleSizeRange?: {
     min?: number;                      // Min size multiplier (default: 0.2)
     max?: number;                      // Max size multiplier (default: 2.0)
-  };
-  bloom?: {
-    enabled?: boolean;                 // Enable bloom (default: true)
-    strength?: number;                 // Bloom intensity (default: 1.5)
-    radius?: number;                   // Bloom radius (default: 0.8)
-    threshold?: number;                // Bloom threshold (default: 0.1)
   };
   camera?: {
     position?: [number, number, number]; // Camera position (default: [0, 0, 10])
@@ -231,10 +225,10 @@ interface ShapeConfig {
 <ParticleMorph
   stages={[...]}
   targetParticleCount={5000}
-  bloom={{
+  glow={{
     enabled: true,
-    strength: 1.2,
-    threshold: 0.2,
+    intensity: 1.2,
+    coverage: 0.2,
   }}
   particleAnimation={{
     enabled: true,
@@ -258,7 +252,7 @@ interface ShapeConfig {
 ## Performance Tips
 
 1. **Particle Count**: Start with 5000-8000 particles. Adjust based on device performance
-2. **Bloom**: Reduce bloom strength or disable on lower-end devices
+2. **Glow**: Reduce glow intensity or disable on lower-end devices
 3. **Particle Animation**: Disable or reduce drift for better performance
 4. **Stage Count**: Limit to 4 stages maximum for optimal performance
 
@@ -286,7 +280,7 @@ interface ShapeConfig {
 
 ### 1.1.0
 - Interactive rotation
-- Bloom effects
+- Glow effects
 - Performance improvements
 
 ### 1.0.0

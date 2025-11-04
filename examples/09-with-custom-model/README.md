@@ -155,7 +155,7 @@ If you have models in other formats (OBJ, FBX, etc.):
 ### Low FPS
 - Reduce model vertex count
 - Lower `targetParticleCount`
-- Disable or reduce bloom effects
+- Disable or reduce glow effects
 
 ## Advanced: Multiple Custom Models
 

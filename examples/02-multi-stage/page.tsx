@@ -57,12 +57,6 @@ export default function MultiStageExample() {
           min: 0.2,
           max: 1.5,
         }}
-        bloom={{
-          enabled: true,
-          strength: 2.0,
-          radius: 0.9,
-          threshold: 0.05,
-        }}
         camera={{
           position: [0, 0, 12],
           fov: 75,

@@ -31,7 +31,7 @@ Demonstrates the explosion feature where particles dramatically scatter.
 - Explosion effect on second stage
 - Large explosion radius (50)
 - High particle count (10,000)
-- Enhanced bloom effects
+- Enhanced glow effects
 
 ### 04. Color Transitions
 **File:** `04-color-transitions/page.tsx`  
@@ -41,7 +41,7 @@ Showcases smooth color transitions through a rainbow spectrum.
 - Rainbow color scheme
 - Four different shapes
 - Balanced animation settings
-- Strong bloom effects
+- Strong glow effects
 
 ### 05. Geometric Shapes
 **File:** `05-geometric-shapes/page.tsx`  
@@ -150,14 +150,14 @@ particleSizeRange={{
 
 ### Visual Effects
 
-#### `bloom`
-Post-processing glow effect:
+#### `glow`
+Particle glow effect:
 ```tsx
-bloom={{
+glow={{
   enabled: true,
-  strength: 1.5,    // Intensity (0-5)
-  radius: 0.8,      // Spread (0-1)
-  threshold: 0.1    // Activation threshold (0-1)
+  intensity: 1.5,   // Glow brightness multiplier
+  frequency: 1.0,   // Glow pulse speed
+  coverage: 0.25    // Percentage of particles that glow (0-1)
 }}
 ```
 
@@ -205,7 +205,7 @@ particleAnimation={{
 ## Performance Tips
 
 1. **Particle Count**: Start with 5,000 and adjust based on target devices
-2. **Bloom Effects**: Disable or reduce strength on lower-end devices
+2. **Glow Effects**: Disable or reduce intensity on lower-end devices
 3. **Particle Animations**: Reduce dampingFactor and driftSpeed for better performance
 4. **Segments**: Lower segment count for geometric shapes (16-32 is usually sufficient)
 
@@ -213,7 +213,7 @@ particleAnimation={{
 
 1. **Scroll Ranges**: Ensure scroll ranges don't overlap for smooth transitions
 2. **Color Contrast**: Use contrasting colors for better visual effect
-3. **Bloom Threshold**: Adjust based on particle colors (lower for darker colors)
+3. **Glow Coverage**: Adjust based on particle colors and desired visual effect
 4. **Camera Position**: Adjust z-position based on shape size and desired perspective
 5. **Mobile**: Add viewport detection for responsive experiences
 

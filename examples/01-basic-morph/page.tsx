@@ -41,12 +41,6 @@ export default function BasicMorphExample() {
         ]}
         targetParticleCount={5000}
         particleSize={3}
-        bloom={{
-          enabled: true,
-          strength: 1.5,
-          radius: 0.8,
-          threshold: 0.1,
-        }}
         camera={{
           position: [0, 0, 10],
           fov: 75,

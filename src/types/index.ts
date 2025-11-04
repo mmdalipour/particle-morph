@@ -69,12 +69,6 @@ export interface ParticleMorphConfig {
     min?: number;
     max?: number;
   };
-  bloom?: {
-    enabled?: boolean;
-    strength?: number;
-    radius?: number;
-    threshold?: number;
-  };
   camera?: {
     position?: [number, number, number];
     fov?: number;

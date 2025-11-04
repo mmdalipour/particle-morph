@@ -57,12 +57,6 @@ export default function ColorTransitionsExample() {
           min: 0.3,
           max: 1.8,
         }}
-        bloom={{
-          enabled: true,
-          strength: 2.0,
-          radius: 1.0,
-          threshold: 0.0,
-        }}
         camera={{
           position: [0, 0, 12],
           fov: 75,

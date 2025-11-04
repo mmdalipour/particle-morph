@@ -11,6 +11,7 @@ import { UseInteractiveRotationReturn } from '../types';
  * @param autoRotateEnabled - Enable auto-rotation when stopped (default: true)
  * @param autoRotateDampingFactor - Controls auto-rotation smoothness (default: 0.05)
  * @param autoRotateSpeed - Auto-rotation speeds when idle
+ * @param interactiveEnabled - Enable pointer interactions (default: true)
  */
 export function useInteractiveRotation(
   initialRotation: { x?: number; y?: number; z?: number } = {},
@@ -20,7 +21,8 @@ export function useInteractiveRotation(
     x?: number;
     y?: number;
     z?: number;
-  } = {}
+  } = {},
+  interactiveEnabled: boolean = true
 ): UseInteractiveRotationReturn {
   const { camera } = useThree();
   const isDraggingRef = useRef(false);
@@ -46,6 +48,8 @@ export function useInteractiveRotation(
   const [rotation, setRotation] = useState(new THREE.Euler(initialX, initialY, initialZ, 'YXZ'));
 
   const onPointerDown = useCallback((event: any) => {
+    if (!interactiveEnabled) return;
+    
     event.stopPropagation?.();
     isDraggingRef.current = true;
     setIsDragging(true);
@@ -63,10 +67,10 @@ export function useInteractiveRotation(
     
     // Reset velocity to prevent momentum from interfering with initial drag
     velocity.current = { x: 0, y: 0 };
-  }, []);
+  }, [interactiveEnabled]);
 
   const onPointerMove = useCallback((event: any) => {
-    if (!isDraggingRef.current || !targetQuaternion.current) return;
+    if (!interactiveEnabled || !isDraggingRef.current || !targetQuaternion.current) return;
     event.stopPropagation?.();
 
     const nativeEvent = event.nativeEvent || event;
@@ -95,7 +99,7 @@ export function useInteractiveRotation(
     velocity.current.y = velocity.current.y * 0.7 + newVelocityY * 0.3;
 
     previousMousePosition.current = { x: clientX, y: clientY };
-  }, [camera]);
+  }, [camera, interactiveEnabled]);
 
   const onPointerUp = useCallback(() => {
     isDraggingRef.current = false;
@@ -105,27 +109,30 @@ export function useInteractiveRotation(
   useFrame(() => {
     if (!quaternion.current || !targetQuaternion.current) return;
 
-    if (isDraggingRef.current) {
+    if (isDraggingRef.current && interactiveEnabled) {
       // Smooth response during drag - feels more natural and fluid
       quaternion.current.slerp(targetQuaternion.current, 0.12);
     } else {
-      // Apply velocity for momentum effect
-      const cameraRight = new THREE.Vector3();
-      const cameraUp = new THREE.Vector3();
-      camera.matrix.extractBasis(cameraRight, cameraUp, new THREE.Vector3());
-      
-      targetQuaternion.current.premultiply(
-        new THREE.Quaternion().setFromAxisAngle(cameraUp.normalize(), velocity.current.y)
-      );
-      targetQuaternion.current.premultiply(
-        new THREE.Quaternion().setFromAxisAngle(cameraRight.normalize(), velocity.current.x)
-      );
-      
-      // Decay velocity smoothly (friction effect)
-      velocity.current.x *= 0.97;
-      velocity.current.y *= 0.97;
+      // Only apply velocity if interactive is enabled
+      if (interactiveEnabled) {
+        // Apply velocity for momentum effect
+        const cameraRight = new THREE.Vector3();
+        const cameraUp = new THREE.Vector3();
+        camera.matrix.extractBasis(cameraRight, cameraUp, new THREE.Vector3());
+        
+        targetQuaternion.current.premultiply(
+          new THREE.Quaternion().setFromAxisAngle(cameraUp.normalize(), velocity.current.y)
+        );
+        targetQuaternion.current.premultiply(
+          new THREE.Quaternion().setFromAxisAngle(cameraRight.normalize(), velocity.current.x)
+        );
+        
+        // Decay velocity smoothly (friction effect)
+        velocity.current.x *= 0.97;
+        velocity.current.y *= 0.97;
+      }
 
-      // Check if velocity is very small
+      // Check if velocity is very small or interactive is disabled
       const stopped = Math.abs(velocity.current.x) < 0.0001 && Math.abs(velocity.current.y) < 0.0001;
       
       if (stopped && autoRotateEnabled) {
@@ -137,7 +144,7 @@ export function useInteractiveRotation(
         
         // Apply damping only during auto-rotation
         quaternion.current.slerp(targetQuaternion.current, autoRotateDampingFactor);
-      } else {
+      } else if (interactiveEnabled) {
         // Smooth response for momentum (slight damping for smoothness)
         quaternion.current.slerp(targetQuaternion.current, 0.12);
       }

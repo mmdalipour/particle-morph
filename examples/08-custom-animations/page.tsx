@@ -60,12 +60,6 @@ export default function CustomAnimationsExample() {
           min: 0.2,
           max: 2.5,
         }}
-        bloom={{
-          enabled: true,
-          strength: 2.0,
-          radius: 1.0,
-          threshold: 0.05,
-        }}
         camera={{
           position: [0, 0, 12],
           fov: 75,

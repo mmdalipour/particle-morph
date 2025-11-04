@@ -53,16 +53,16 @@
 
 ### Visual Enhancements
 ```tsx
-bloom={{
-  enabled: true,
-  strength: 1.5,   // 0-5
-  radius: 0.8,     // 0-1
-  threshold: 0.1   // 0-1
-}}
-
 particleSizeRange={{
   min: 0.1,  // Size variation
   max: 2.0
+}}
+
+glow={{
+  enabled: true,
+  intensity: 1.5,   // Glow brightness multiplier
+  frequency: 1.0,   // Glow pulse speed
+  coverage: 0.25    // Percentage of particles that glow (0-1)
 }}
 ```
 
@@ -120,7 +120,7 @@ stages={[
 
 **Optimization:**
 - Lower `segments` (16-32 is sufficient)
-- Reduce `bloom.strength` or disable
+- Reduce `glow.intensity` or disable
 - Lower `particleAnimation` values
 - Fewer stages in morph sequence
 
@@ -128,7 +128,7 @@ stages={[
 
 ### Low FPS
 - Reduce `targetParticleCount`
-- Disable or reduce `bloom` effects
+- Disable or reduce `glow` effects
 - Lower `particleAnimation` values
 
 ### Particles not visible
