@@ -4,13 +4,6 @@ All notable changes to this project will be documented in this file.
 
 ## [1.4.1] - 2025-11-04
 
-### Changed
-- **Demo Page Update**: Removed bloom effect configuration from main demo page
-  - Simplified visual presentation for better performance
-  - Bloom effect still available as a prop option in the library
-
-## [1.4.0] - 2025-11-04
-
 ### Added
 - **Camera-Relative Rotation**: Interactive rotation now works relative to the camera's perspective
   - Drag direction always matches visual movement regardless of camera angle
