@@ -90,9 +90,18 @@ interface ParticleMorphConfig {
     fov?: number;                      // Field of view (default: 75)
   };
   rotation?: {
-    enabled?: boolean;                 // Enable rotation (default: true)
-    dampingFactor?: number;            // Smoothness (default: 0.08)
-    autoRotateSpeed?: number;          // Auto-rotate speed (default: 0.001)
+    x?: number;                        // Initial rotation X in radians (default: 0)
+    y?: number;                        // Initial rotation Y in radians (default: 0)
+    z?: number;                        // Initial rotation Z in radians (default: 0)
+    autoRotate?: {
+      enabled?: boolean;               // Enable auto-rotation (default: true)
+      dampingFactor?: number;          // Auto-rotation smoothness (default: 0.05)
+      speed?: {
+        x?: number;                    // Auto-rotate X speed (default: 0)
+        y?: number;                    // Auto-rotate Y speed (default: 0)
+        z?: number;                    // Auto-rotate Z speed (default: 0)
+      };
+    };
   };
   particleAnimation?: {
     enabled?: boolean;                 // Enable drift animation (default: true)

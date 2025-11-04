@@ -77,9 +77,16 @@ export default function HighParticleCountExample() {
           fov: 75,
         }}
         rotation={{
-          enabled: true,
-          dampingFactor: 0.1,
-          autoRotateSpeed: 0.001,
+          x: 0,
+          y: 0,
+          z: 0,
+          autoRotate: {
+            enabled: true,
+            dampingFactor: 0.05,
+            speed: {
+              y: 0.001,
+            },
+          },
         }}
         particleAnimation={{
           enabled: true,

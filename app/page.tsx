@@ -93,6 +93,7 @@ export default function Home() {
             shape: { type: "sphere", size: 5 },
             scrollStart: 0.25,
             scrollEnd: 1,
+            color: "#FFA500",
             explosion: {
               enabled: true,
               radius: 20,
@@ -105,20 +106,24 @@ export default function Home() {
           min: 0.1,
           max: 2.0,
         }}
-        bloom={{
-          enabled: true,
-          strength: 1.5,
-          radius: 0.8,
-          threshold: 0.1,
-        }}
         camera={{
           position: [0, 0, 10],
           fov: 75,
         }}
+        interactive
         rotation={{
-          enabled: true,
-          dampingFactor: 0.08,
-          autoRotateSpeed: 0.001,
+          x: 0.3, // Initial tilt on X axis (radians)
+          y: 0.7, // Initial rotation on Y axis (radians)
+          z: 0,
+          autoRotate: {
+            enabled: true,
+            dampingFactor: 0.01, // Smoothness of auto-rotation
+            speed: {
+              x: 0.01, // Auto-rotation on X
+              y: 0.01, // Auto-rotate on Y axis
+              z: 0, // No auto-rotation on Z
+            },
+          },
         }}
         particleColor="#00ffff"
         particleAnimation={{
@@ -126,6 +131,12 @@ export default function Home() {
           dampingFactor: 2,
           driftSpeed: 2.5,
           driftAmplitude: 0.75,
+        }}
+        glow={{
+          enabled: true,
+          intensity: 1,
+          frequency: 10,
+          coverage: 0.25,
         }}
       />
 

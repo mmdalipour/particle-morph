@@ -165,9 +165,18 @@ bloom={{
 Interactive rotation controls:
 ```tsx
 rotation={{
-  enabled: true,
-  dampingFactor: 0.08,      // Rotation smoothness (0-1)
-  autoRotateSpeed: 0.001    // Auto-rotation speed
+  x: 0,                      // Initial rotation on X axis (radians)
+  y: 0,                      // Initial rotation on Y axis (radians)
+  z: 0,                      // Initial rotation on Z axis (radians)
+  autoRotate: {
+    enabled: true,           // Enable auto-rotation
+    dampingFactor: 0.05,     // Auto-rotation smoothness (0-1)
+    speed: {
+      x: 0,                  // Auto-rotation speed on X axis
+      y: 0.001,              // Auto-rotation speed on Y axis
+      z: 0                   // Auto-rotation speed on Z axis
+    }
+  }
 }}
 ```
 

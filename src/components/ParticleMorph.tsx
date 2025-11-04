@@ -21,8 +21,10 @@ function ParticleSystem({
   particleSize,
   particleSizeRange,
   scrollProgress,
+  interactiveEnabled,
   rotationConfig,
   particleAnimationConfig,
+  glowConfig,
   onDraggingChange
 }: {
   stages: ParticleMorphConfig['stages'];
@@ -31,24 +33,39 @@ function ParticleSystem({
   particleSize: number;
   particleSizeRange: { min?: number; max?: number };
   scrollProgress: number;
+  interactiveEnabled: boolean;
   rotationConfig: ParticleMorphConfig['rotation'];
   particleAnimationConfig: ParticleMorphConfig['particleAnimation'];
+  glowConfig: ParticleMorphConfig['glow'];
   onDraggingChange: (isDragging: boolean) => void;
 }) {
   const pointsRef = useRef<THREE.Points>(null);
   const groupRef = useRef<THREE.Group>(null);
 
-  const rotationEnabled = rotationConfig?.enabled !== false;
-  const dampingFactor = rotationConfig?.dampingFactor ?? 0.08;
-  const autoRotateSpeed = rotationConfig?.autoRotateSpeed ?? 0.001;
+  const rotationEnabled = rotationConfig !== undefined;
+  const initialRotation = {
+    x: rotationConfig?.x ?? 0,
+    y: rotationConfig?.y ?? 0,
+    z: rotationConfig?.z ?? 0
+  };
+  const autoRotateEnabled = rotationConfig?.autoRotate?.enabled ?? true;
+  const autoRotateDampingFactor = rotationConfig?.autoRotate?.dampingFactor ?? 0.05;
+  const autoRotateSpeed = rotationConfig?.autoRotate?.speed ?? {};
 
   const animationEnabled = particleAnimationConfig?.enabled !== false;
   const animationDampingFactor = particleAnimationConfig?.dampingFactor ?? 0.5;
   const driftSpeed = particleAnimationConfig?.driftSpeed ?? 0.5;
   const driftAmplitude = particleAnimationConfig?.driftAmplitude ?? 0.15;
 
+  const glowEnabled = glowConfig?.enabled !== false;
+  const glowIntensity = glowConfig?.intensity ?? 1.5;
+  const glowFrequency = glowConfig?.frequency ?? 1.0;
+  const glowCoverage = glowConfig?.coverage ?? 0.25;
+
   const { rotation, onPointerDown, onPointerMove, onPointerUp, isDragging } = useInteractiveRotation(
-    dampingFactor,
+    initialRotation,
+    autoRotateEnabled,
+    autoRotateDampingFactor,
     autoRotateSpeed
   );
 
@@ -118,6 +135,9 @@ function ParticleSystem({
         uDampingStrength: { value: animationDampingFactor },
         uDriftSpeed: { value: driftSpeed },
         uDriftAmplitude: { value: driftAmplitude },
+        uGlowIntensity: { value: glowEnabled ? glowIntensity : 0.0 },
+        uGlowFrequency: { value: glowFrequency },
+        uGlowCoverage: { value: glowCoverage },
         uStage0Range: { value: stageRanges[0] },
         uStage1Range: { value: stageRanges[1] },
         uStage2Range: { value: stageRanges[2] },
@@ -133,7 +153,7 @@ function ParticleSystem({
     });
     
     return mat;
-  }, [geometry, stageColors, particleSize, animationEnabled, animationDampingFactor, driftSpeed, driftAmplitude, stages]);
+  }, [geometry, stageColors, particleSize, animationEnabled, animationDampingFactor, driftSpeed, driftAmplitude, glowEnabled, glowIntensity, glowFrequency, glowCoverage, stages]);
 
   useEffect(() => {
     if (material) {
@@ -189,7 +209,7 @@ function ParticleSystem({
         material={material}
         frustumCulled={false}
       />
-      {rotationEnabled && (
+      {rotationEnabled && interactiveEnabled && (
         <mesh
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
@@ -223,6 +243,17 @@ function ParticleSystem({
  *   ]}
  *   particleColor="#00ffff"
  *   targetParticleCount={5000}
+ *   interactive={true}
+ *   rotation={{
+ *     x: 0.3,
+ *     y: 0.7,
+ *     z: 0,
+ *     autoRotate: {
+ *       enabled: true,
+ *       dampingFactor: 0.05,
+ *       speed: { x: 0, y: 0.01, z: 0 }
+ *     }
+ *   }}
  * />
  * ```
  */
@@ -245,16 +276,19 @@ export function ParticleMorph({
     position: [0, 0, 10],
     fov: 75
   },
-  rotation = {
-    enabled: true,
-    dampingFactor: 0.08,
-    autoRotateSpeed: 0.001
-  },
+  interactive = false,
+  rotation,
   particleAnimation = {
     enabled: true,
     dampingFactor: 0.5,
     driftSpeed: 0.5,
     driftAmplitude: 0.15
+  },
+  glow = {
+    enabled: true,
+    intensity: 1.5,
+    frequency: 1.0,
+    coverage: 0.25
   },
   className,
   style
@@ -271,6 +305,8 @@ export function ParticleMorph({
 
   const cameraPosition = camera?.position ?? [0, 0, 10];
   const cameraFov = camera?.fov ?? 75;
+  
+  const interactiveEnabled = interactive === true; // Default to false
 
   return (
     <div 
@@ -312,8 +348,8 @@ export function ParticleMorph({
           style={{ 
             width: '100%', 
             height: '100%', 
-            cursor: isDragging ? 'grabbing' : 'grab',
-            touchAction: 'none'
+            cursor: interactiveEnabled ? (isDragging ? 'grabbing' : 'grab') : 'default',
+            touchAction: interactiveEnabled ? 'none' : 'auto'
           }}
         >
           <ParticleSystem
@@ -323,8 +359,10 @@ export function ParticleMorph({
             particleSize={particleSize}
             particleSizeRange={particleSizeRange}
             scrollProgress={scrollProgress}
+            interactiveEnabled={interactiveEnabled}
             rotationConfig={rotation}
             particleAnimationConfig={particleAnimation}
+            glowConfig={glow}
             onDraggingChange={setIsDragging}
           />
 

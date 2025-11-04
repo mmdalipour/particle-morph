@@ -71,9 +71,16 @@ export default function CustomAnimationsExample() {
           fov: 75,
         }}
         rotation={{
-          enabled: true,
-          dampingFactor: 0.05,
-          autoRotateSpeed: 0.004,
+          x: 0,
+          y: 0,
+          z: 0,
+          autoRotate: {
+            enabled: true,
+            dampingFactor: 0.05,
+            speed: {
+              y: 0.004,
+            },
+          },
         }}
         particleAnimation={{
           enabled: true,

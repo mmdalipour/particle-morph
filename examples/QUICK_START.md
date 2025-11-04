@@ -69,9 +69,16 @@ particleSizeRange={{
 ### Interactivity
 ```tsx
 rotation={{
-  enabled: true,
-  dampingFactor: 0.08,    // Smoothness
-  autoRotateSpeed: 0.001  // Auto-spin
+  x: 0,                   // Initial rotation X (radians)
+  y: 0,                   // Initial rotation Y (radians)
+  z: 0,                   // Initial rotation Z (radians)
+  autoRotate: {
+    enabled: true,
+    dampingFactor: 0.05,  // Auto-rotation smoothness
+    speed: {
+      y: 0.001            // Auto-spin on Y axis
+    }
+  }
 }}
 
 particleAnimation={{

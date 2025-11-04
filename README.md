@@ -125,9 +125,14 @@ The main component for creating particle morph effects.
     fov: 75
   }}
   rotation={{                          // Optional: Rotation config
-    enabled: true,
-    dampingFactor: 0.08,
-    autoRotateSpeed: 0.001
+    x: 0,
+    y: 0,
+    z: 0,
+    autoRotate: {
+      enabled: true,
+      dampingFactor: 0.05,
+      speed: { y: 0.001 }
+    }
   }}
   scroll={{                            // Optional: Scroll config
     enabled: true,
@@ -269,7 +274,16 @@ Morph between different geometric shapes:
 <ParticleMorph
   modelPath="/models/sphere.glb"
   scroll={{ enabled: false }}
-  rotation={{ autoRotateSpeed: 0.005 }}
+  rotation={{
+    x: 0,
+    y: 0,
+    z: 0,
+    autoRotate: {
+      enabled: true,
+      dampingFactor: 0.05,
+      speed: { y: 0.005 }
+    }
+  }}
 />
 ```
 

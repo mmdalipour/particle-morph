@@ -2,6 +2,90 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.1] - 2025-11-04
+
+### Changed
+- **Demo Page Update**: Removed bloom effect configuration from main demo page
+  - Simplified visual presentation for better performance
+  - Bloom effect still available as a prop option in the library
+
+## [1.4.0] - 2025-11-04
+
+### Added
+- **Camera-Relative Rotation**: Interactive rotation now works relative to the camera's perspective
+  - Drag direction always matches visual movement regardless of camera angle
+  - Uses quaternion-based rotation for smooth, natural motion
+  - Enhanced momentum with velocity smoothing for better feel
+  
+- **Initial Rotation Configuration**: Set starting rotation for your particle system
+  - New `rotation.x`, `rotation.y`, `rotation.z` props for initial rotation in radians
+  - Particles start at the exact angle you specify
+  
+- **Per-Axis Auto-Rotation**: Fine control over automatic rotation
+  - New `rotation.autoRotate.speed` object with `x`, `y`, `z` properties
+  - Set different rotation speeds for each axis independently
+  - Create complex spinning effects (e.g., tumbling, spinning on multiple axes)
+  
+- **Interactive Toggle**: New `interactive` prop to enable/disable user interaction
+  - Default: `false` (non-interactive)
+  - Set to `true` to allow drag-to-rotate
+  - Cursor automatically changes to grab/grabbing when enabled
+  
+- **Particle Glow Effect**: Random pulsing glow on particles
+  - New `glow` configuration object
+  - `intensity`: Controls glow brightness (default: 1.5)
+  - `frequency`: Controls pulse speed (default: 1.0)
+  - `coverage`: Percentage of particles that glow, 0-1 (default: 0.25)
+  - Each particle has unique random glow phase and speed
+  - Exponential glow halo extends beyond particle core
+  - Glowing particles are 50% larger for better visibility
+
+### Changed (Breaking Changes)
+- **Rotation API Restructured**: The rotation configuration has been completely redesigned
+  - `rotation.enabled` is **removed** → Use `interactive` prop instead
+  - `rotation.dampingFactor` → `rotation.autoRotate.dampingFactor`
+  - `rotation.autoRotateSpeed` → `rotation.autoRotate.speed` (object with x, y, z)
+  - Added `rotation.x`, `rotation.y`, `rotation.z` for initial rotation
+  
+### Migration Guide
+```tsx
+// OLD (v1.x)
+<ParticleMorph
+  rotation={{
+    enabled: true,
+    dampingFactor: 0.08,
+    autoRotateSpeed: 0.001
+  }}
+/>
+
+// NEW (v2.0)
+<ParticleMorph
+  interactive={true}
+  rotation={{
+    x: 0,
+    y: 0,
+    z: 0,
+    autoRotate: {
+      enabled: true,
+      dampingFactor: 0.05,
+      speed: { x: 0, y: 0.001, z: 0 }
+    }
+  }}
+/>
+```
+
+### Improved
+- **Better Drag Behavior**: Quaternion-based rotation prevents gimbal lock
+- **Smoother Momentum**: Velocity smoothing creates more natural deceleration
+- **Auto-rotation Transition**: Seamless switch between momentum and auto-rotation
+- **Shader Performance**: Glow effect calculated efficiently per-particle in GPU
+
+### Technical Details
+- Updated `useInteractiveRotation` hook with quaternion math
+- Added fragment shader uniforms: `uGlowIntensity`, `uGlowFrequency`, `uGlowCoverage`
+- Added vertex shader varying: `vGlowSeed` for per-particle randomness
+- Enhanced fragment shader with exponential glow halo and brightness boost
+
 ## [1.3.0] - 2025-01-04
 
 ### Added

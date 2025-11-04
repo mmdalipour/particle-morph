@@ -16,6 +16,7 @@ uniform float uAnimationEnabled;
 uniform float uDampingStrength;
 uniform float uDriftSpeed;
 uniform float uDriftAmplitude;
+uniform float uGlowCoverage;
 
 // Stage configuration (x: scrollStart, y: scrollEnd)
 uniform vec2 uStage0Range;
@@ -36,6 +37,7 @@ uniform vec3 uStage3Color;
 // Varying to pass data to fragment shader
 varying float vDistance;
 varying vec3 vColor;
+varying float vGlowSeed;
 
 // Realistic explosion expansion - fast burst with deceleration
 // Simulates initial explosive force that slows down over time
@@ -277,7 +279,15 @@ void main() {
   float distance = -modelViewPosition.z;
   vDistance = distance;
   
+  // Pass per-particle random seed for glow effect
+  vGlowSeed = animationSeed.x * 43758.5453 + animationSeed.y * 12.9898 + animationSeed.z * 78.233;
+  
+  // Make particles larger when they might glow for better visibility
+  float glowNoise = fract(sin(vGlowSeed) * 43758.5453);
+  float glowThreshold = 1.0 - uGlowCoverage;
+  float sizeMultiplier = 1.0 + step(glowThreshold, glowNoise) * 0.5; // 50% larger for glow particles
+  
   float sizeAttenuation = 1.0 / max(distance, 1.0);
-  gl_PointSize = uSize * uPixelRatio * sizeAttenuation * particleScale * 10.0 + 0.5;
+  gl_PointSize = uSize * uPixelRatio * sizeAttenuation * particleScale * 10.0 * sizeMultiplier + 0.5;
 }
 
