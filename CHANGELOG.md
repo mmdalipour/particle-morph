@@ -2,6 +2,53 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2025-01-04
+
+### Added
+- **Default Particle Color**: New `particleColor` prop allows setting a default color for all stages
+  - Individual stage colors take priority over the default
+  - Simplifies color management for single-color effects
+  - Defaults to white (#ffffff) when not specified
+
+### Changed
+- **Removed `segments` Parameter**: Simplified API by removing the unnecessary segments configuration
+  - Now uses optimal default value of 32 segments internally
+  - Reduces API complexity and boilerplate
+  - **Breaking Change**: Remove `segments` from your shape configurations
+
+### Improved
+- **Explosion Effects**: Significantly enhanced explosion realism
+  - Physics-based motion with exponential ease-out (fast burst that decelerates)
+  - Realistic implosion with accelerating motion (gravity-like pull)
+  - Variable particle speeds (some particles fly faster than others)
+  - Added turbulence and rotational effects during explosion
+  - More chaotic scattering (60% randomness vs 30% before)
+  - Faster explosion trigger (immediate burst)
+
+- **Sphere Particle Distribution**: Fixed grid pattern issue
+  - Implemented Fibonacci sphere algorithm for uniform distribution
+  - Eliminates visible latitude/longitude lines
+  - Particles now spread naturally across sphere surface
+  - No more grid patterns when particle animation is disabled
+
+- **Major Performance Optimizations**:
+  - Shader optimizations: reduced normalize() calls, pre-computed values
+  - Scroll handler throttling (~120fps max) with requestAnimationFrame
+  - Smart uniform updates (only update when progress changes > 0.001)
+  - Reduced device pixel ratio from 2.0 to 1.5
+  - Disabled antialiasing for better GPU performance
+  - Medium precision shaders instead of high precision
+  - Optimized bloom rendering with multisampling disabled
+  - Combined multiplication operations in shaders
+  - Cleaner explosion calculations with cached values
+
+### Technical Details
+- Updated vertex shader with optimized explosion calculations
+- Improved scroll handling with RAF batching and throttling
+- Enhanced Canvas configuration for better performance
+- Fixed color system to respect stage color priority
+- Removed segments from all type definitions and utilities
+
 ## [1.2.0] - 2025-11-02
 
 ### Added
