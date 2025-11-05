@@ -40,10 +40,17 @@ export interface ParticleAnimationConfig {
   driftAmplitude?: number;
 }
 
+// Responsive value type - can be a direct value or object with pixel breakpoints as keys
+// This union type allows both the original value type T and responsive breakpoint objects
+// Examples:
+//   ResponsiveValue<number> accepts: 5000 OR { 0: 3000, 768: 6000, 1024: 10000 }
+//   ResponsiveValue<[number, number, number]> accepts: [0, 0, 10] OR { 0: [0, 0, 15], 1024: [0, 0, 10] }
+export type ResponsiveValue<T> = T | { [breakpoint: number]: T }
+
 // Shape configuration for geometric morphing
 export interface ShapeConfig {
   type: 'sphere' | 'box' | 'torus' | 'cone' | 'cylinder' | 'dodecahedron' | 'octahedron' | 'tetrahedron' | 'model';
-  size?: number; // Size of the shape (default: 5)
+  size?: ResponsiveValue<number>; // Size of the shape (default: 5) - can be responsive
   modelPath?: string; // Path to 3D model file (required when type is 'model')
 }
 
@@ -55,23 +62,23 @@ export interface ShapeStage {
   color?: string; // Color for this stage (hex or CSS color)
   explosion?: {
     enabled: boolean;
-    radius: number;
+    radius: ResponsiveValue<number>; // Explosion radius - can be responsive
   };
 }
 
 // Core particle morph configuration
 export interface ParticleMorphConfig {
   stages: ShapeStage[];
-  targetParticleCount?: number;
+  targetParticleCount?: ResponsiveValue<number>;
   particleColor?: string; // Default color for all stages (can be overridden per stage)
-  particleSize?: number;
+  particleSize?: ResponsiveValue<number>;
   particleSizeRange?: {
     min?: number;
     max?: number;
   };
   camera?: {
-    position?: [number, number, number];
-    fov?: number;
+    position?: ResponsiveValue<[number, number, number]>;
+    fov?: ResponsiveValue<number>;
   };
   interactive?: boolean; // Enable user interaction (drag to rotate), default: false
   rotation?: RotationConfig;

@@ -11,6 +11,7 @@ A highly configurable React component library for creating stunning 3D particle 
 - 🖱️ **Interactive Rotation** - Drag to rotate with inertia and smooth damping
 - 📜 **Scroll Integration** - Animate particles based on scroll progress
 - 💫 **Glow Effects** - Beautiful particle glow with customizable intensity
+- 📱 **Responsive Design** - Automatically adapts to different screen sizes for optimal performance
 - ⚙️ **Highly Configurable** - Customize colors, sizes, behaviors, and more
 - 🎯 **TypeScript** - Full TypeScript support with comprehensive types
 - 📦 **Modular Architecture** - Use individual components and hooks as needed
@@ -137,6 +138,30 @@ The main component for creating particle morph effects.
     dampingFactor: 0.5,
     driftSpeed: 0.5,
     driftAmplitude: 0.15
+  }}
+  // Optional: Responsive values - use pixel breakpoints as object keys
+  // Define constants for better readability
+  targetParticleCount={{               // Can be number or { [pixels]: value }
+    [0]: 3000,      // Mobile (0px and up)
+    [768]: 6000,    // Tablet (768px and up)
+    [1024]: 10000   // Desktop (1024px and up)
+  }}
+  particleSize={{
+    [0]: 1.8,
+    [768]: 2.4,
+    [1024]: 3
+  }}
+  camera={{
+    position: {
+      [0]: [0, 0, 15],
+      [768]: [0, 0, 12],
+      [1024]: [0, 0, 10]
+    },
+    fov: {
+      [0]: 60,
+      [768]: 70,
+      [1024]: 75
+    }
   }}
   background="#000000"                 // Optional: Background color
 />
@@ -334,6 +359,166 @@ Control the variation in particle sizes for more natural or dramatic effects:
 - **max**: Maximum size multiplier (default: 2.0) - larger values create bigger particles
 - Creates depth and visual interest with varied particle scales
 - Each particle gets a unique random size within the specified range
+
+### Responsive Design
+
+Parameters can accept responsive values using **pixel-based breakpoints** as object keys. Define any number of breakpoints at specific viewport widths:
+
+```tsx
+// Define breakpoint constants for better readability
+const MOBILE = 0;
+const TABLET = 768;
+const DESKTOP = 1024;
+
+<ParticleMorph
+  stages={[
+    {
+      shape: {
+        type: "sphere",
+        // Responsive shape size
+        size: {
+          [MOBILE]: 4,
+          [TABLET]: 4.5,
+          [DESKTOP]: 5,
+        }
+      },
+      scrollStart: 0,
+      scrollEnd: 0.5
+    },
+    {
+      shape: {
+        type: "box",
+        size: {
+          [MOBILE]: 4,
+          [TABLET]: 4.5,
+          [DESKTOP]: 5,
+        }
+      },
+      scrollStart: 0.5,
+      scrollEnd: 1,
+      explosion: {
+        enabled: true,
+        // Responsive explosion radius
+        radius: {
+          [MOBILE]: 15,
+          [TABLET]: 18,
+          [DESKTOP]: 20,
+        }
+      }
+    }
+  ]}
+  // Responsive particle count - use pixel widths as keys
+  targetParticleCount={{
+    [MOBILE]: 3000,      // 0px and up (mobile)
+    [TABLET]: 6000,      // 768px and up (tablet)
+    [DESKTOP]: 10000,    // 1024px and up (desktop)
+  }}
+  // Responsive particle size
+  particleSize={{
+    [MOBILE]: 1.8,
+    [TABLET]: 2.4,
+    [DESKTOP]: 3,
+  }}
+  // Responsive camera position
+  camera={{
+    position: {
+      [MOBILE]: [0, 0, 15],      // Further away on mobile
+      [TABLET]: [0, 0, 12],      // Medium distance on tablet
+      [DESKTOP]: [0, 0, 10],     // Close on desktop
+    },
+    fov: {
+      [MOBILE]: 60,
+      [TABLET]: 70,
+      [DESKTOP]: 75,
+    }
+  }}
+/>
+```
+
+**Mix responsive and non-responsive values freely:**
+
+All parameters that support `ResponsiveValue<T>` accept both the original type `T` and the responsive object `{ [pixels]: T }`. You can mix and match as needed:
+
+```tsx
+const MOBILE = 0;
+const DESKTOP = 1024;
+
+<ParticleMorph
+  stages={[
+    {
+      shape: {
+        type: "sphere",
+        size: 5  // ✅ Plain number - same for all devices
+      },
+      scrollStart: 0,
+      scrollEnd: 0.5
+    },
+    {
+      shape: {
+        type: "box",
+        size: { [MOBILE]: 4, [DESKTOP]: 5 }  // ✅ Responsive - adapts to screen
+      },
+      scrollStart: 0.5,
+      scrollEnd: 1,
+      explosion: {
+        enabled: true,
+        radius: 20  // ✅ Plain number - same explosion for all
+      }
+    }
+  ]}
+  targetParticleCount={{ [MOBILE]: 3000, [DESKTOP]: 10000 }}  // ✅ Responsive
+  particleSize={3}              // ✅ Plain number - same for all devices
+  camera={{
+    position: { [MOBILE]: [0, 0, 15], [DESKTOP]: [0, 0, 10] },  // ✅ Responsive
+    fov: 75                     // ✅ Plain number - same for all devices
+  }}
+/>
+```
+
+**Advanced: Custom breakpoints at any pixel width:**
+
+```tsx
+// Define custom breakpoints for your specific needs
+const SMALL_PHONE = 0;
+const PHONE = 480;
+const TABLET = 768;
+const LAPTOP = 1024;
+const DESKTOP = 1440;
+const LARGE_SCREEN = 1920;
+
+<ParticleMorph
+  targetParticleCount={{
+    [SMALL_PHONE]: 2000,    // Very small screens
+    [PHONE]: 3000,          // Small phones
+    [TABLET]: 5000,         // Tablets
+    [LAPTOP]: 8000,         // Small laptops
+    [DESKTOP]: 10000,       // Desktop
+    [LARGE_SCREEN]: 15000,  // Large screens
+  }}
+/>
+```
+
+**How it works:**
+- The component uses the **largest breakpoint** that is ≤ current viewport width
+- At 800px viewport: uses value from `768` key (ignores `1024` since it's larger)
+- At 1500px viewport: uses value from `1024` key (largest one ≤ 1500px)
+- Automatically adapts in real-time when window is resized
+
+**Benefits:**
+- **Pixel-Perfect Control**: Define breakpoints at exact pixel widths
+- **Unlimited Breakpoints**: Not limited to 3 predefined sizes
+- **Type-Safe**: Full TypeScript support with proper type inference
+- **Flexible**: Mix responsive and non-responsive values as needed
+- **Better Performance**: Automatically reduces particle count on mobile devices
+- **Seamless Experience**: Adapts in real-time when window is resized
+
+**Responsive Parameters:**
+- `targetParticleCount` - Number of particles
+- `particleSize` - Base particle size
+- `camera.position` - Camera position
+- `camera.fov` - Field of view
+- `shape.size` - Size of each shape in stages
+- `explosion.radius` - Explosion radius for each stage
 
 ## 📦 Publishing to NPM
 

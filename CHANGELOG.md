@@ -2,6 +2,116 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.0] - 2025-11-05
+
+### Added
+- **Responsive Design System**: Pixel-based breakpoints for maximum flexibility
+  - Parameters can now accept responsive objects using pixel widths as keys: `{ 0: value1, 768: value2, 1024: value3 }`
+  - Responsive parameters: `targetParticleCount`, `particleSize`, `camera.position`, `camera.fov`, `shape.size`, `explosion.radius`
+  - Unlimited breakpoints - define as many pixel-based breakpoints as needed
+  - Real-time adaptation when window is resized
+  - Use constants for better readability: `const MOBILE = 0; targetParticleCount={{ [MOBILE]: 2000 }}`
+  - New `useResponsive` hook returns current viewport width
+  - New `resolveResponsiveValue<T>` utility function for custom implementations
+  - Exports `ResponsiveValue<T>` and `ResolvedShapeStage` types
+
+### Examples
+
+**Responsive particle count and size:**
+```tsx
+// Define breakpoint constants
+const MOBILE = 0;
+const TABLET = 768;
+const DESKTOP = 1024;
+
+<ParticleMorph
+  targetParticleCount={{ [MOBILE]: 3000, [TABLET]: 6000, [DESKTOP]: 10000 }}
+  particleSize={{ [MOBILE]: 1.8, [TABLET]: 2.4, [DESKTOP]: 3 }}
+/>
+```
+
+**Responsive camera:**
+```tsx
+<ParticleMorph
+  camera={{
+    position: { 0: [0, 0, 15], 768: [0, 0, 12], 1024: [0, 0, 10] },
+    fov: { 0: 60, 768: 70, 1024: 75 }
+  }}
+/>
+```
+
+**Multiple custom breakpoints:**
+```tsx
+<ParticleMorph
+  targetParticleCount={{
+    0: 2000,      // Very small screens
+    480: 3000,    // Small phones
+    768: 5000,    // Tablets
+    1024: 8000,   // Laptops
+    1440: 10000,  // Desktop
+    1920: 15000   // Large screens
+  }}
+/>
+```
+
+**Responsive shape sizes and explosion radius:**
+```tsx
+const MOBILE = 0;
+const DESKTOP = 1024;
+
+<ParticleMorph
+  stages={[
+    {
+      shape: {
+        type: "sphere",
+        size: { [MOBILE]: 4, [DESKTOP]: 5 }  // Smaller shapes on mobile
+      },
+      scrollStart: 0,
+      scrollEnd: 0.5
+    },
+    {
+      shape: { type: "box", size: { [MOBILE]: 4, [DESKTOP]: 5 } },
+      scrollStart: 0.5,
+      scrollEnd: 1,
+      explosion: {
+        enabled: true,
+        radius: { [MOBILE]: 15, [DESKTOP]: 20 }  // Smaller explosion on mobile
+      }
+    }
+  ]}
+/>
+```
+
+**Mix responsive and non-responsive:**
+```tsx
+<ParticleMorph
+  targetParticleCount={{ 0: 3000, 1024: 10000 }}
+  particleSize={3}  // Same for all devices
+/>
+```
+
+### How It Works
+- Component uses the **largest breakpoint** that is ≤ current viewport width
+- At 800px viewport: uses value from `768` key
+- At 1500px viewport: uses value from `1024` key
+- No predefined device categories - full control over breakpoints
+
+### Benefits
+- Pixel-perfect control: Define breakpoints at exact pixel widths
+- Unlimited breakpoints: Not limited to 3 predefined sizes
+- Type-safe: Full TypeScript support with proper type inference
+- Flexible: Mix responsive and non-responsive values as needed
+- Better performance: Automatically reduces particle count on mobile devices
+- Seamless experience: Adapts in real-time when window is resized
+
+### Technical Details
+- Added `ResponsiveValue<T>` generic type: `T | { [breakpoint: number]: T }`
+- Simplified `useResponsive` hook to return current viewport width
+- Created `resolveResponsiveValue<T>` utility with breakpoint selection logic
+- Updated `ParticleMorph` component to resolve responsive values based on width
+- Removed device type categorization for more flexible approach
+- Added example: `10-responsive` demonstrating pixel-based responsive configuration
+
 ## [1.4.2] - 2025-11-04
 
 ### Fixed

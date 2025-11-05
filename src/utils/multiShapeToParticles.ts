@@ -1,17 +1,28 @@
 import * as THREE from 'three';
 import { ShapeConfig, generateShapeParticles } from './shapeToParticles';
-import { ShapeStage } from '../types';
+
+// Resolved stage type (ResponsiveValues already resolved to numbers)
+export interface ResolvedShapeStage {
+  shape: ShapeConfig; // Uses the util's ShapeConfig with plain number
+  scrollStart: number;
+  scrollEnd: number;
+  color?: string;
+  explosion?: {
+    enabled: boolean;
+    radius: number;
+  };
+}
 
 /**
  * Generates particle positions for multiple shape stages
- * @param stages - Array of shape stages with optional explosion effects
+ * @param stages - Array of shape stages with optional explosion effects (with resolved responsive values)
  * @param particleCount - Number of particles
  * @param sizeRangeMin - Minimum particle size multiplier
  * @param sizeRangeMax - Maximum particle size multiplier
  * @returns Promise that resolves to object with positions for each stage and particle attributes
  */
 export async function generateMultiShapeParticles(
-  stages: ShapeStage[],
+  stages: ResolvedShapeStage[],
   particleCount: number = 5000,
   sizeRangeMin: number = 0.2,
   sizeRangeMax: number = 2.0

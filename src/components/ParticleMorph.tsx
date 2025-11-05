@@ -6,9 +6,26 @@ import * as THREE from 'three';
 import { useScrollProgress } from '../hooks/useScrollProgress';
 import { useMultiShapeMorphGeometry } from '../hooks/useMultiShapeMorphGeometry';
 import { useInteractiveRotation } from '../hooks/useInteractiveRotation';
-import { ParticleMorphConfig } from '../types';
+import { useResponsive, resolveResponsiveValue } from '../hooks/useResponsive';
+import { ParticleMorphConfig, ShapeStage } from '../types';
 import vertexShader from '../shaders/particleMultiShapeMorph.vert.glsl';
 import fragmentShader from '../shaders/particleMorph.frag.glsl';
+
+// Resolved stage type with plain numbers (ResponsiveValues resolved)
+type ResolvedShapeStage = {
+  shape: {
+    type: ShapeStage['shape']['type'];
+    size?: number;
+    modelPath?: string;
+  };
+  scrollStart: number;
+  scrollEnd: number;
+  color?: string;
+  explosion?: {
+    enabled: boolean;
+    radius: number;
+  };
+};
 
 /**
  * ParticleSystem - Internal component that renders the particle system
@@ -26,7 +43,7 @@ function ParticleSystem({
   glowConfig,
   onDraggingChange
 }: {
-  stages: ParticleMorphConfig['stages'];
+  stages: ResolvedShapeStage[];
   targetParticleCount: number;
   particleColor: string;
   particleSize: number;
@@ -288,12 +305,41 @@ export function ParticleMorph({
   style
 }: ParticleMorphConfig) {
   const scrollProgress = useScrollProgress(true);
+  const currentWidth = useResponsive();
   
   const [isDragging, setIsDragging] = useState(false);
   const canvasRef = useRef<HTMLDivElement>(null);
 
-  const cameraPosition = camera?.position ?? [0, 0, 10];
-  const cameraFov = camera?.fov ?? 75;
+  // Resolve responsive values for each parameter
+  const resolvedParticleCount = Math.round(
+    resolveResponsiveValue(targetParticleCount, currentWidth)
+  );
+  const resolvedParticleSize = resolveResponsiveValue(particleSize, currentWidth);
+
+  // Resolve camera values
+  const resolvedCameraPosition: [number, number, number] = resolveResponsiveValue(
+    camera?.position ?? [0, 0, 10],
+    currentWidth
+  ) as [number, number, number];
+  const resolvedCameraFov = resolveResponsiveValue(
+    camera?.fov ?? 75,
+    currentWidth
+  );
+
+  // Resolve responsive shape sizes and explosion radii in stages
+  const resolvedStages = useMemo(() => {
+    return stages.map(stage => ({
+      ...stage,
+      shape: {
+        ...stage.shape,
+        size: resolveResponsiveValue(stage.shape.size ?? 5, currentWidth) as number
+      },
+      explosion: stage.explosion ? {
+        enabled: stage.explosion.enabled,
+        radius: resolveResponsiveValue(stage.explosion.radius, currentWidth) as number
+      } : undefined
+    }));
+  }, [stages, currentWidth]);
   
   const interactiveEnabled = interactive === true; // Default to false
 
@@ -320,8 +366,8 @@ export function ParticleMorph({
       >
         <Canvas
           camera={{
-            position: cameraPosition,
-            fov: cameraFov
+            position: resolvedCameraPosition,
+            fov: resolvedCameraFov
           }}
           gl={{ 
             antialias: false, // Disable antialiasing for better performance
@@ -342,10 +388,10 @@ export function ParticleMorph({
           }}
         >
           <ParticleSystem
-            stages={stages}
-            targetParticleCount={targetParticleCount}
+            stages={resolvedStages}
+            targetParticleCount={resolvedParticleCount}
             particleColor={particleColor}
-            particleSize={particleSize}
+            particleSize={resolvedParticleSize}
             particleSizeRange={particleSizeRange}
             scrollProgress={scrollProgress}
             interactiveEnabled={interactiveEnabled}

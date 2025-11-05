@@ -5,13 +5,16 @@ export { ParticleMorph } from './components/ParticleMorph';
 export { 
   useInteractiveRotation, 
   useScrollProgress, 
-  useMultiShapeMorphGeometry
+  useMultiShapeMorphGeometry,
+  useResponsive,
+  resolveResponsiveValue
 } from './hooks';
 
 // Utils
 export { generateShapeParticles } from './utils/shapeToParticles';
 export { generateMultiShapeParticles } from './utils/multiShapeToParticles';
 export type { ShapeType, ShapeConfig as ShapeConfigUtil } from './utils/shapeToParticles';
+export type { ResolvedShapeStage } from './utils/multiShapeToParticles';
 
 // Types
 export type {
@@ -20,6 +23,7 @@ export type {
   UseInteractiveRotationReturn,
   RotationConfig,
   ParticleAnimationConfig,
+  ResponsiveValue,
   ShapeConfig,
   ShapeStage
 } from './types';

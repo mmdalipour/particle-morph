@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 
 const ParticleMorph = dynamic(
@@ -18,51 +17,12 @@ const ParticleMorph = dynamic(
   }
 );
 
+// Responsive breakpoints
+const MOBILE = 0;
+const TABLET = 768;
+const DESKTOP = 1024;
+
 export default function Home() {
-  const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const checkViewport = () => {
-      setIsDesktop(window.innerWidth >= 1024);
-    };
-
-    checkViewport();
-    window.addEventListener("resize", checkViewport);
-
-    return () => {
-      window.removeEventListener("resize", checkViewport);
-    };
-  }, []);
-
-  if (isDesktop === null) {
-    return (
-      <div
-        style={{ width: "100vw", height: "500vh", backgroundColor: "#000000" }}
-      />
-    );
-  }
-
-  if (!isDesktop) {
-    return (
-      <div
-        style={{
-          width: "100vw",
-          height: "100vh",
-          backgroundColor: "#000000",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "#00ffff",
-          fontSize: "1.5rem",
-          textAlign: "center",
-          padding: "2rem",
-        }}
-      >
-        Please view on desktop for the best experience
-      </div>
-    );
-  }
-
   return (
     <>
       {/* Scroll hint */}
@@ -85,42 +45,77 @@ export default function Home() {
       <ParticleMorph
         stages={[
           {
-            shape: { type: "box", size: 5 },
+            shape: {
+              type: "box",
+              // Responsive shape size
+              size: {
+                [MOBILE]: 4,
+                [TABLET]: 4.5,
+                [DESKTOP]: 5,
+              },
+            },
             scrollStart: 0,
             scrollEnd: 0.25,
           },
           {
-            shape: { type: "sphere", size: 5 },
+            shape: {
+              type: "sphere",
+              size: {
+                [MOBILE]: 4,
+                [TABLET]: 4.5,
+                [DESKTOP]: 5,
+              },
+            },
             scrollStart: 0.25,
             scrollEnd: 1,
             color: "#FFA500",
             explosion: {
               enabled: true,
-              radius: 20,
+              // Responsive explosion radius
+              radius: {
+                [MOBILE]: 15,    // Smaller explosion on mobile
+                [TABLET]: 17,    // Medium explosion on tablet
+                [DESKTOP]: 20,   // Full explosion on desktop
+              },
             },
           },
         ]}
-        targetParticleCount={5000}
-        particleSize={4}
+        // Responsive particle count - adapts to screen size
+        targetParticleCount={{
+          [MOBILE]: 2000,      // Mobile: reduced for better performance
+          [TABLET]: 3500,      // Tablet: medium particle count
+          [DESKTOP]: 5000,     // Desktop: full particle count
+        }}
+        // Responsive particle size
+        particleSize={{
+          [MOBILE]: 3,
+          [TABLET]: 3.5,
+          [DESKTOP]: 4,
+        }}
         particleSizeRange={{
           min: 0.1,
           max: 2.0,
         }}
+        // Responsive camera position - further on mobile for better view
         camera={{
-          position: [0, 0, 10],
+          position: {
+            [MOBILE]: [0, 0, 15],    // Mobile: further away
+            [TABLET]: [0, 0, 12],    // Tablet: medium distance
+            [DESKTOP]: [0, 0, 10],   // Desktop: close
+          },
           fov: 75,
         }}
         rotation={{
-          x: 0.3, // Initial tilt on X axis (radians)
-          y: 0.7, // Initial rotation on Y axis (radians)
+          x: 0.3,
+          y: 0.7,
           z: 0,
           autoRotate: {
             enabled: true,
-            dampingFactor: 0.01, // Smoothness of auto-rotation
+            dampingFactor: 0.01,
             speed: {
-              x: 0.01, // Auto-rotation on X
-              y: 0.01, // Auto-rotate on Y axis
-              z: 0, // No auto-rotation on Z
+              x: 0.01,
+              y: 0.01,
+              z: 0,
             },
           },
         }}

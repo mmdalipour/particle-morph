@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react';
 import * as THREE from 'three';
-import { generateMultiShapeParticles } from '../utils/multiShapeToParticles';
-import { ParticleGeometryResult, ShapeStage } from '../types';
+import { generateMultiShapeParticles, ResolvedShapeStage } from '../utils/multiShapeToParticles';
+import { ParticleGeometryResult } from '../types';
 
 /**
  * Hook to generate particle geometry from multiple shapes for multi-stage morphing
- * @param stages - Array of shape/explosion stages with scroll ranges
+ * @param stages - Array of shape/explosion stages with scroll ranges (with resolved responsive values)
  * @param particleCount - Number of particles to generate
  * @param sizeRangeMin - Minimum particle size multiplier
  * @param sizeRangeMax - Maximum particle size multiplier
  * @returns Geometry with position0-3 and other particle attributes
  */
 export function useMultiShapeMorphGeometry(
-  stages: ShapeStage[],
+  stages: ResolvedShapeStage[],
   particleCount: number = 5000,
   sizeRangeMin: number = 0.2,
   sizeRangeMax: number = 2.0
